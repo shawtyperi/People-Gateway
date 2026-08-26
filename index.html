@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Gateway - Central HR Launchpad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Prompt & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+
+        function hideIframeLoader() {
+            const loader = document.getElementById('iframe-loader');
+            if (loader) loader.style.display = 'none';
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Prompt', 'Inter', 'sans-serif'],
+                        display: ['Prompt', 'sans-serif']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.8' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { 
+            font-family: 'Prompt', 'Inter', sans-serif; 
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+        /* Modern Glass Card Effect */
+        .bento-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dark .bento-card {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(30, 41, 59, 0.8);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Gradient Glowing Borders */
+        .glow-border-indigo {
+            position: relative;
+        }
+        .glow-border-indigo::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 1.5rem;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(168, 85, 247, 0.2), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        /* Background Animated Mesh */
+        .mesh-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .mesh-orb-1 {
+            position: absolute;
+            top: -10%;
+            left: 20%;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            filter: blur(60px);
+        }
+        .dark .mesh-orb-1 {
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+        .mesh-orb-2 {
+            position: absolute;
+            bottom: -10%;
+            right: 10%;
+            width: 45vw;
+            height: 45vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+            filter: blur(70px);
+        }
+        .dark .mesh-orb-2 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 relative selection:bg-indigo-500 selection:text-white">
+
+    <!-- Ambient Mesh Background -->
+    <div class="mesh-bg">
+        <div class="mesh-orb-1 animate-pulse-glow"></div>
+        <div class="mesh-orb-2"></div>
+    </div>
+
+    <header class="h-20 border-b border-slate-200/80 dark:border-slate-800/80 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3.5">
+            <div class="relative flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-500/25">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <span class="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-slate-950"></span>
+                </span>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white tracking-tight leading-none">PEOPLE & SAFETY GATEWAY</h1>
+                    <span class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wide">HR & SAFETY HUB 2026</span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">ศูนย์กลางแอปพลิเคชัน & เครื่องมือแผนกทรัพยากรบุคคลและความปลอดภัย</p>
+            </div>
+        </div>
+
+        <!-- Right Utilities -->
+        <div class="flex items-center space-x-3">
+            <!-- Search Input Trigger -->
+            <div class="relative hidden md:block w-64">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="search-input" onkeyup="searchApps()" placeholder="ค้นหาแอป, พนักงาน, นโยบาย..." class="w-full bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded">/</span>
+            </div>
+
+            <!-- Theme Switcher Button -->
+            <button onclick="toggleTheme()" id="theme-btn" class="w-10 h-10 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-amber-400 flex items-center justify-center transition-all border border-slate-200/80 dark:border-slate-800" title="สลับธีม">
+                <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+            </button>
+
+            <!-- Add App Modal Button -->
+            <button onclick="openAddModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs px-4 py-2.5 rounded-2xl font-medium transition-all shadow-md shadow-indigo-500/20 flex items-center hover:scale-[1.02] active:scale-[0.98]">
+                <i class="fa-solid fa-plus mr-2 text-xs"></i>
+                <span class="hidden sm:inline">เพิ่มลิงก์ / แอปพลิเคชัน</span>
+                <span class="sm:hidden">เพิ่ม</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-white p-6 sm:p-8 border border-slate-800/80 shadow-2xl">
+            <!-- Decorative Accent Elements -->
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute right-1/4 -bottom-10 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="space-y-3 max-w-2xl">
+                    <div class="inline-flex items-center space-x-2 bg-indigo-500/15 border border-indigo-400/20 px-3.5 py-1 rounded-full text-xs text-indigo-300 font-medium">
+                        <i class="fa-solid fa-sparkles text-amber-300"></i>
+                        <span>People Operations & Excellence Portal</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        ยินดีต้อนรับสู่ People Gateway 👋
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">
+                        ศูนย์รวมระบบ แอปพลิเคชัน แดชบอร์ด และเครื่องมือปฏิบัติการแบบเบ็ดเสร็จ ครอบคลุมทั้ง 4 สายงานหลักในแผนกทรัพยากรบุคคล
+                    </p>
+                </div>
+
+                <!-- Quick Counters -->
+                <div class="grid grid-cols-4 gap-3 self-start lg:self-center w-full lg:w-auto">
+                    <div class="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-3 text-center">
+                        <div class="text-lg font-bold text-emerald-400 flex items-center justify-center gap-1">
+                            <span>2</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Live Apps</div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-3 text-center">
+                        <div class="text-lg font-bold text-amber-400">3</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">In Roadmap</div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-3 text-center">
+                        <div class="text-lg font-bold text-indigo-400">5</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Key Roles</div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-3 text-center">
+                        <div class="text-lg font-bold text-purple-400">100%</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Coverage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 sticky top-24 z-20 transition-all">
+            <!-- Role Selector Pills -->
+            <div class="flex items-center space-x-1.5 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+                <button onclick="filterRole('all')" id="pill-all" class="role-btn text-xs px-4 py-2.5 rounded-xl font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-grid-2 mr-2"></i>ทั้งหมด
+                    <span class="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-[10px]">6</span>
+                </button>
+                <button onclick="filterRole('ops')" id="pill-ops" class="role-btn text-xs px-4 py-2.5 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-server mr-2 text-blue-500"></i>People Operations & HRIS
+                </button>
+                <button onclick="filterRole('pbp')" id="pill-pbp" class="role-btn text-xs px-4 py-2.5 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-industry mr-2 text-amber-500"></i>PBP Factory Manager
+                </button>
+                <button onclick="filterRole('ta')" id="pill-ta" class="role-btn text-xs px-4 py-2.5 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-user-plus mr-2 text-purple-500"></i>TA Senior Officer
+                </button>
+                <button onclick="filterRole('lg')" id="pill-lg" class="role-btn text-xs px-4 py-2.5 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-graduation-cap mr-2 text-emerald-500"></i>Learning & Growth
+                </button>
+                <button onclick="filterRole('safety')" id="pill-safety" class="role-btn text-xs px-4 py-2.5 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-hard-hat mr-2 text-rose-500"></i>Safety & EHS Officer
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-base tracking-tight">แอปพลิเคชันที่พร้อมใช้งาน (Live Apps)</h3>
+                </div>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">คลิกเพื่อเปิดใช้งานในพอร์ตัลได้ทันที</span>
+            </div>
+
+            <!-- BENTO GRID: LIVE APPS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="live-apps-grid">
+                
+                <!-- LIVE APP 1: DASHBOARD พนักงาน & การลา -->
+                <div class="app-card bento-card glow-border-indigo rounded-3xl p-6 sm:p-7 flex flex-col justify-between group relative overflow-hidden shadow-sm hover:shadow-xl" data-role="ops" data-keywords="dashboard พนักงาน การลา hr hris leave ops headcount analytics" data-app-id="app-1">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
+
+                    <div>
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="togglePin('app-1')" title="ติดดาวแอปที่ชอบ" class="pin-btn p-2 text-slate-300 dark:text-slate-600 hover:text-amber-400 text-base transition-colors">
+                                    <i class="fa-solid fa-star"></i>
+                                </button>
+                                <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> ใช้งานได้เลย
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-server"></i>
+                                <span>People Operations & HRIS</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-xl group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Dashboard พนักงาน & การลา</h4>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed mt-2">
+                                สรุปสถิติการลาป่วย ลากิจ ลาพักร้อนคงเหลือ รายงาน Headcount ยอดกำลังพลรวมรายแผนก และข้อมูล HR Analytics สำหรับการตัดสินใจ
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-3">
+                        <button onclick="openApp('Dashboard พนักงาน & การลา', 'https://vsc-people-dashbroad.vercel.app/')" class="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs py-3 px-4 rounded-2xl font-semibold transition-all text-center flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:scale-[1.01]">
+                            <i class="fa-solid fa-circle-play mr-2 text-sm"></i> เปิดใช้งานในพอร์ตัล
+                        </button>
+                        <a href="https://vsc-people-dashbroad.vercel.app/" target="_blank" class="p-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-xs transition-all flex items-center gap-1.5 font-medium" title="เปิดในแท็บใหม่">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span class="hidden sm:inline">แยกแท็บ</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- LIVE APP 2: E-BOOK ORIENTATION APP -->
+                <div class="app-card bento-card glow-border-indigo rounded-3xl p-6 sm:p-7 flex flex-col justify-between group relative overflow-hidden shadow-sm hover:shadow-xl" data-role="lg" data-keywords="e-book orientation คู่มือ ปฐมนิเทศ พนักงานใหม่ lg learning growth" data-app-id="app-2">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
+
+                    <div>
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="togglePin('app-2')" title="ติดดาวแอปที่ชอบ" class="pin-btn p-2 text-slate-300 dark:text-slate-600 hover:text-amber-400 text-base transition-colors">
+                                    <i class="fa-solid fa-star"></i>
+                                </button>
+                                <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> ใช้งานได้เลย
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                <span>Learning & Growth Senior Manager</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-xl group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">E-Book Orientation App</h4>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed mt-2">
+                                หนังสือดิจิทัลสำหรับการปฐมนิเทศพนักงานใหม่ รวบรวมสวัสดิการ วัฒนธรรมองค์กร ข้อบังคับ และแนวทางปฏิบัติต่างๆ ในรูปแบบอ่านง่าย
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-3">
+                        <button onclick="openApp('E-Book Orientation App', 'https://people-center-nine.vercel.app/')" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs py-3 px-4 rounded-2xl font-semibold transition-all text-center flex items-center justify-center shadow-lg shadow-emerald-500/20 hover:scale-[1.01]">
+                            <i class="fa-solid fa-circle-play mr-2 text-sm"></i> เปิดใช้งานในพอร์ตัล
+                        </button>
+                        <a href="https://people-center-nine.vercel.app/" target="_blank" class="p-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl text-xs transition-all flex items-center gap-1.5 font-medium" title="เปิดในแท็บใหม่">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span class="hidden sm:inline">แยกแท็บ</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-between pt-6">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-solid fa-laptop-code text-indigo-500 text-base"></i>
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-base tracking-tight">เครื่องมือประจำสายงาน (Role Interactive Workspaces)</h3>
+                </div>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ชุดมอดูลทดลองใช้งานตรงตาม 4 ตำแหน่ง</span>
+            </div>
+
+            <!-- INTERACTIVE ROLE WORKSPACE TABS GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- WORKSPACE 1: TA RECRUITMENT & HEADCOUNT FUNNEL -->
+                <div class="app-card bento-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" data-role="ta" data-keywords="ta recruitment funnel headcountสัมภาษณ์ ผู้สมัคร candidates" data-app-id="app-ta-workspace">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">TA Interview & Headcount Funnel</h4>
+                                    <p class="text-[11px] text-purple-600 dark:text-purple-400 font-medium">Talent Acquisition Senior Officer</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 text-[10px] px-2.5 py-1 rounded-full font-semibold">Live Interactive</span>
+                        </div>
+
+                        <!-- Funnel Mini Dashboard -->
+                        <div class="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                                <span>Recruitment Stage Progress</span>
+                                <span class="text-indigo-600 dark:text-indigo-400 font-bold">Target Hired: 12 / 15 Position</span>
+                            </div>
+                            <!-- Stage Bars -->
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-slate-600 dark:text-slate-300 mb-1">
+                                        <span>1. Applied / Screening</span>
+                                        <span class="font-bold">142 คน</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-slate-600 dark:text-slate-300 mb-1">
+                                        <span>2. 1st Interview (HR)</span>
+                                        <span class="font-bold">38 คน</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                                        <div class="bg-indigo-500 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-slate-600 dark:text-slate-300 mb-1">
+                                        <span>3. Final Interview (User)</span>
+                                        <span class="font-bold">18 คน</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                                        <div class="bg-purple-500 h-2 rounded-full" style="width: 35%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-clock-rotate-left mr-1"></i>อัปเดตล่าสุดวันนี้ 09:30</span>
+                        <button onclick="showInfoModal('TA Interview & Headcount Funnel', 'รายงานสรุปสถานะการสรรหาบุคลากรเทียบกับแผน Headcount ขออนุมัติ แสดง funnel การสัมภาษณ์งานแบบ Real-time')" class="text-xs bg-purple-600 hover:bg-purple-500 text-white px-3.5 py-2 rounded-xl font-medium transition-all">
+                            รายละเอียดมอดูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WORKSPACE 2: L&G PROBATION 119-DAY TRACKER -->
+                <div class="app-card bento-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" data-role="lg" data-keywords="lg probation 119 วัน ประเมิน ทดลองงาน learning growth" data-app-id="app-lg-workspace">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">Probation 119-Day Tracker</h4>
+                                    <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Learning & Growth Senior Manager</p>
+                                </div>
+                            </div>
+                            <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-[10px] px-2.5 py-1 rounded-full font-semibold">Live Interactive</span>
+                        </div>
+
+                        <!-- Probation Alert Table -->
+                        <div class="overflow-x-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[10px]">
+                                        <th class="pb-2">ชื่อพนักงาน</th>
+                                        <th class="pb-2">แผนก</th>
+                                        <th class="pb-2 text-center">เหลือเวลา</th>
+                                        <th class="pb-2 text-right">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
+                                    <tr>
+                                        <td class="py-2 font-medium">คุณกิตติศักดิ์ ม.</td>
+                                        <td class="text-slate-500">QA Factory</td>
+                                        <td class="text-center font-bold text-amber-500">15 วัน</td>
+                                        <td class="text-right"><span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full text-[9px] font-semibold">รอผลประเมิน</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 font-medium">คุณวิภาวรรณ ส.</td>
+                                        <td class="text-slate-500">People Ops</td>
+                                        <td class="text-center font-bold text-emerald-500">45 วัน</td>
+                                        <td class="text-right"><span class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full text-[9px] font-semibold">กำลังอบรม</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-bell text-amber-500 mr-1"></i>แจ้งเตือนประเมิน 2 รายการ</span>
+                        <button onclick="showInfoModal('Probation 119-Day Tracker', 'ระบบแจ้งเตือนและติดตามรอบการประเมินผลทดลองงานพนักงานใหม่ก่อนครบกำหนด 119 วัน เพื่อให้ Supervisor ส่งผลประเมินทันเวลา')" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-medium transition-all">
+                            รายละเอียดมอดูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WORKSPACE 3: PBP FACTORY WORKFORCE & OT HEALTH -->
+                <div class="app-card bento-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" data-role="pbp" data-keywords="pbp factory ot workforce plant health โรงงาน สายผลิต" data-app-id="app-pbp-workspace">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-industry"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">Factory Workforce & OT Health</h4>
+                                    <p class="text-[11px] text-amber-600 dark:text-amber-400 font-medium">People Business Partner Manager (Factory)</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 text-[10px] px-2.5 py-1 rounded-full font-semibold">Live Interactive</span>
+                        </div>
+
+                        <!-- Plant Health Quick Stats -->
+                        <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="p-2">
+                                <div class="text-xs text-slate-400 font-medium">เข้างานวันนี้</div>
+                                <div class="text-base font-bold text-emerald-500 mt-1">98.4%</div>
+                            </div>
+                            <div class="p-2 border-x border-slate-200 dark:border-slate-800">
+                                <div class="text-xs text-slate-400 font-medium">OT ชั่วโมง/สัปดาห์</div>
+                                <div class="text-base font-bold text-amber-500 mt-1">14.2 ชม.</div>
+                            </div>
+                            <div class="p-2">
+                                <div class="text-xs text-slate-400 font-medium">Attrition Rate</div>
+                                <div class="text-base font-bold text-indigo-500 mt-1">1.8%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i>สถิติแรงงานปกติ</span>
+                        <button onclick="showInfoModal('Factory Workforce & OT Health', 'สรุปสถิติอัตราการเข้าทำงานของพนักงานสายงานผลิต สถิติชั่วโมงการทำงานล่วงเวลา (OT) อัตราการลาออก และประเด็นแรงงานสัมพันธ์')" class="text-xs bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl font-medium transition-all">
+                            รายละเอียดมอดูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WORKSPACE 4: PEOPLE OPS DIRECTORY & HEADCOUNT CALCULATOR -->
+                <div class="app-card bento-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" data-role="ops" data-keywords="ops directory headcount ค้นหาพนักงาน โครงสร้างองค์กร hris" data-app-id="app-ops-workspace">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">Employee Directory Quick Finder</h4>
+                                    <p class="text-[11px] text-blue-600 dark:text-blue-400 font-medium">People Operations & HRIS Senior Officer</p>
+                                </div>
+                            </div>
+                            <span class="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 text-[10px] px-2.5 py-1 rounded-full font-semibold">Live Interactive</span>
+                        </div>
+
+                        <!-- Employee Quick Finder -->
+                        <div class="space-y-2 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="relative">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="directory-search" onkeyup="filterDirectory()" placeholder="พิมพ์ชื่อ หรือ รหัสพนักงานเพื่อค้นหา..." class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div id="directory-results" class="text-xs space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50">
+                                    <div>
+                                        <div class="font-semibold text-slate-800 dark:text-slate-200">คุณสมชาย ใจดี (EMP-0104)</div>
+                                        <div class="text-[10px] text-slate-400">Senior Factory Specialist • PBP Team</div>
+                                    </div>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded-full font-medium">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-users text-blue-500 mr-1"></i>พนักงานรวม 450 คน</span>
+                        <button onclick="showInfoModal('Employee Directory Quick Finder', 'เครื่องมือค้นหาข้อมูลพนักงานเบื้องต้น สังกัดแผนก เบอร์โทรติดต่อภายใน และสถานะการทำงาน สำหรับทีม People Operations')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-xl font-medium transition-all">
+                            รายละเอียดมอดูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WORKSPACE 5: SAFETY & EHS INCIDENT & ZERO ACCIDENT TRACKER -->
+                <div class="app-card bento-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" data-role="safety" data-keywords="safety ehs zero accident incident near miss จป ความปลอดภัย อุบัติเหตุ permit work" data-app-id="app-safety-workspace">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-hard-hat"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">EHS Safety Incident & Zero Accident Tracker</h4>
+                                    <p class="text-[11px] text-rose-600 dark:text-rose-400 font-medium">Safety & Occupational Health Specialist (จป.)</p>
+                                </div>
+                            </div>
+                            <span class="bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 text-[10px] px-2.5 py-1 rounded-full font-semibold">Live Interactive</span>
+                        </div>
+
+                        <!-- Safety Dashboard Stats -->
+                        <div class="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                    <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400">สถิติสะสมทำงานปลอดภัย (LTI Free):</span>
+                                </div>
+                                <span class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">420 วัน</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-100 dark:border-slate-700">
+                                    <div class="text-[10px] text-slate-400 font-medium">Near-Miss เดือนนี้</div>
+                                    <div class="text-sm font-bold text-amber-500 mt-0.5">3 รายการ</div>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-100 dark:border-slate-700">
+                                    <div class="text-[10px] text-slate-400 font-medium">Work Permit ขออนุมัติ</div>
+                                    <div class="text-sm font-bold text-indigo-500 mt-0.5">8 ฉบับ</div>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-100 dark:border-slate-700">
+                                    <div class="text-[10px] text-slate-400 font-medium">Safety Pass Rate</div>
+                                    <div class="text-sm font-bold text-emerald-500 mt-0.5">99.2%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-shield-check text-emerald-500 mr-1"></i>ไม่มีอุบัติเหตุรุนแรงในปีนี้</span>
+                        <button onclick="showInfoModal('EHS Safety Incident & Zero Accident Tracker', 'ระบบติดตามสถิติความปลอดภัยในการทำงาน บันทึกรายการ Near-Miss / Incident อัตราการอบรม จป. ตามกฎหมาย และใบอนุญาตทำงานความเสี่ยงสูง (Permit to Work)')" class="text-xs bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-xl font-medium transition-all">
+                            รายละเอียดมอดูล
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="bento-card rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-500"></i>
+                    <span>HR & Safety Quick Utilities & Policy Drive</span>
+                </h4>
+                <span class="text-[11px] text-slate-400 font-medium">ศูนย์รวมคลังเอกสาร & แบบฟอร์ม HR / SHE</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <a href="#" onclick="showToast('กำลังเชื่อมต่อฐานข้อมูลเอกสารนโยบาย HR & Safety Policy Drive')" class="p-3.5 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium group">
+                    <i class="fa-solid fa-file-pdf text-rose-500 text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="truncate">HR & Safety Policies</span>
+                </a>
+                <a href="#" onclick="showToast('เปิดแบบฟอร์มแจ้งเหตุความปลอดภัย / Incident Report')" class="p-3.5 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium group">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="truncate">Safety Incident Form</span>
+                </a>
+                <a href="#" onclick="showToast('เปิดสมุดโทรศัพท์ติดต่อภายใน')" class="p-3.5 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium group">
+                    <i class="fa-solid fa-address-book text-emerald-500 text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="truncate">Internal Directory</span>
+                </a>
+                <a href="#" onclick="showToast('เปิดระบบ Helpdesk แจ้งปัญหา HR / Safety')" class="p-3.5 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium group">
+                    <i class="fa-solid fa-headset text-purple-500 text-lg group-hover:scale-110 transition-transform"></i>
+                    <span class="truncate">HR & SHE Helpdesk</span>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="workspace-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex-col transition-all duration-300">
+        <!-- Top Window Toolbar (Mac Browser Style) -->
+        <div class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between text-white flex-shrink-0">
+            <div class="flex items-center space-x-3">
+                <button onclick="closeApp()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-medium flex items-center transition-all border border-slate-700">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> กลับหน้า พอร์ตัล
+                </button>
+                <div class="h-4 w-px bg-slate-800"></div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span id="app-workspace-title" class="font-bold text-sm tracking-tight text-slate-100">App Workspace</span>
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleFullscreen()" class="p-2 text-slate-400 hover:text-white text-xs rounded-xl transition-all" title="เต็มหน้าจอ">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+                <a id="app-workspace-link" href="#" target="_blank" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-medium flex items-center transition-all">
+                    <i class="fa-solid fa-arrow-up-right-from-square mr-1.5"></i> แยกแท็บใหม่
+                </a>
+                <button onclick="closeApp()" class="p-2 text-slate-400 hover:text-rose-400 text-lg transition-colors ml-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Embedded Viewer Canvas -->
+        <div class="flex-1 bg-slate-950 relative">
+            <div id="iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 z-10 text-slate-400 space-y-3">
+                <div class="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                <span class="text-xs font-medium tracking-wide text-slate-400">กำลังโหลดแอปพลิเคชัน...</span>
+            </div>
+            <iframe id="workspace-iframe" src="" class="w-full h-full border-0 relative z-20" onload="hideIframeLoader()"></iframe>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD CUSTOM LINK / APP -->
+    <div id="add-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl text-slate-800 dark:text-slate-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <h3 class="font-bold text-base">เพิ่มลิงก์ / แอปพลิเคชันใหม่</h3>
+                </div>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleAddApp(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-500 dark:text-slate-400 mb-1.5 font-medium">ชื่อแอปพลิเคชัน / ระบบ</label>
+                    <input type="text" id="new-title" required placeholder="เช่น สรุปการอบรม HRD 2026" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-xs">
+                </div>
+                <div>
+                    <label class="block text-slate-500 dark:text-slate-400 mb-1.5 font-medium">URL / ลิงก์ระบบ</label>
+                    <input type="url" id="new-url" required placeholder="https://..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-xs">
+                </div>
+                <div>
+                    <label class="block text-slate-500 dark:text-slate-400 mb-1.5 font-medium">ตำแหน่ง / สายงานที่เกี่ยวข้อง</label>
+                    <select id="new-role" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-xs">
+                        <option value="ops">People Operations & HRIS</option>
+                        <option value="pbp">PBP Manager (Factory)</option>
+                        <option value="ta">TA Senior Officer</option>
+                        <option value="lg">Learning & Growth Senior Manager</option>
+                        <option value="safety">Safety & EHS Officer</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeAddModal()" class="w-1/2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 py-3 rounded-xl text-slate-700 dark:text-slate-300 font-semibold transition-all">ยกเลิก</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold shadow-md shadow-indigo-500/20 transition-all">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: MODULE INFO -->
+    <div id="info-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+            <div>
+                <h3 id="info-title" class="font-bold text-base text-slate-900 dark:text-white">Module Title</h3>
+                <p id="info-desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-2"></p>
+            </div>
+            <button onclick="closeInfoModal()" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs py-3 rounded-xl font-semibold transition-all">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl z-50 hidden items-center space-x-3 text-xs border border-slate-800">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message" class="font-medium">ข้อความแจ้งเตือน</span>
+    </div>
+
+    <script>
+        let currentRole = 'all';
+        let pinnedApps = new Set(JSON.parse(localStorage.getItem('pinnedApps') || '[]'));
+
+        // Initialize state on DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePinIcons();
+            
+            // Search shortcut key '/'
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                    e.preventDefault();
+                    document.getElementById('search-input').focus();
+                }
+            });
+        });
+
+        // Theme Switcher Logic
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('theme-icon');
+
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                icon.className = 'fa-solid fa-sun text-amber-500 text-sm';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                icon.className = 'fa-solid fa-moon text-amber-400 text-sm';
+            }
+        }
+
+        // Role Filter Pills Logic
+        function filterRole(role) {
+            currentRole = role;
+
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-500/20');
+                btn.classList.add('bg-transparent', 'text-slate-600', 'dark:text-slate-400');
+            });
+
+            const activePill = document.getElementById(`pill-${role}`);
+            if (activePill) {
+                activePill.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-500/20');
+                activePill.classList.remove('bg-transparent', 'text-slate-600', 'dark:text-slate-400');
+            }
+
+            searchApps();
+        }
+
+        // Real-time Search Logic
+        function searchApps() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.app-card');
+
+            cards.forEach(card => {
+                const role = card.getAttribute('data-role');
+                const keywords = card.getAttribute('data-keywords').toLowerCase();
+
+                const matchRole = (currentRole === 'all' || currentRole === role);
+                const matchSearch = (query === '' || keywords.includes(query));
+
+                if (matchRole && matchSearch) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Interactive Directory Filter
+        function filterDirectory() {
+            const val = document.getElementById('directory-search').value.toLowerCase();
+            const results = document.getElementById('directory-results');
+            
+            const mockPeople = [
+                { name: 'คุณสมชาย ใจดี (EMP-0104)', role: 'Senior Factory Specialist • PBP Team' },
+                { name: 'คุณณัฐพงษ์ วงศ์สวัสดิ์ (EMP-0211)', role: 'TA Specialist • Talent Acquisition' },
+                { name: 'คุณสิรินธร มณีรัตน์ (EMP-0305)', role: 'HRIS Analyst • People Operations' },
+                { name: 'คุณอนันต์ ชัยชนะ (EMP-0418)', role: 'L&G Trainer • Learning & Growth' }
+            ];
+
+            const filtered = mockPeople.filter(p => p.name.toLowerCase().includes(val) || p.role.toLowerCase().includes(val));
+            
+            if (filtered.length === 0) {
+                results.innerHTML = `<div class="p-2 text-slate-400 text-center text-[11px]">ไม่พบข้อมูลพนักงาน</div>`;
+            } else {
+                results.innerHTML = filtered.map(p => `
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50">
+                        <div>
+                            <div class="font-semibold text-slate-800 dark:text-slate-200">${p.name}</div>
+                            <div class="text-[10px] text-slate-400">${p.role}</div>
+                        </div>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded-full font-medium">Active</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Toggle Favorite / Pin
+        function togglePin(appId) {
+            if (pinnedApps.has(appId)) {
+                pinnedApps.delete(appId);
+                showToast('ยกเลิกติดดาวเรียบร้อย');
+            } else {
+                pinnedApps.add(appId);
+                showToast('ติดดาวแอปพลิเคชันนี้แล้ว');
+            }
+            localStorage.setItem('pinnedApps', JSON.stringify([...pinnedApps]));
+            updatePinIcons();
+        }
+
+        function updatePinIcons() {
+            document.querySelectorAll('.app-card').forEach(card => {
+                const appId = card.getAttribute('data-app-id');
+                const btn = card.querySelector('.pin-btn');
+                if (btn && appId) {
+                    if (pinnedApps.has(appId)) {
+                        btn.classList.remove('text-slate-300', 'dark:text-slate-600');
+                        btn.classList.add('text-amber-400');
+                    } else {
+                        btn.classList.add('text-slate-300', 'dark:text-slate-600');
+                        btn.classList.remove('text-amber-400');
+                    }
+                }
+            });
+        }
+
+        // Open App in Embedded Viewer Modal
+        function openApp(title, url) {
+            document.getElementById('app-workspace-title').innerText = title;
+            document.getElementById('app-workspace-link').href = url;
+            document.getElementById('iframe-loader').style.display = 'flex';
+            document.getElementById('workspace-iframe').src = url;
+
+            const modal = document.getElementById('workspace-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeApp() {
+            const modal = document.getElementById('workspace-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('workspace-iframe').src = '';
+            document.body.style.overflow = '';
+        }
+
+        function toggleFullscreen() {
+            const modal = document.getElementById('workspace-modal');
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Modal Controls
+        function openAddModal() {
+            document.getElementById('add-modal').classList.remove('hidden');
+            document.getElementById('add-modal').classList.add('flex');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+            document.getElementById('add-modal').classList.remove('flex');
+        }
+
+        function handleAddApp(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-title').value;
+            const url = document.getElementById('new-url').value;
+            const role = document.getElementById('new-role').value;
+
+            const grid = document.getElementById('live-apps-grid');
+            const newCard = document.createElement('div');
+            
+            newCard.className = 'app-card bento-card rounded-3xl p-6 flex flex-col justify-between group hover:border-indigo-500/50 transition-all';
+            newCard.setAttribute('data-role', role);
+            newCard.setAttribute('data-keywords', `${title} ${role}`);
+
+            newCard.innerHTML = `
+                <div>
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <span class="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 text-[11px] px-3 py-1 rounded-full font-semibold">
+                            ลิงก์เพิ่มใหม่
+                        </span>
+                    </div>
+                    <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1">${role.toUpperCase()}</div>
+                    <h4 class="font-bold text-slate-900 dark:text-white text-base">${title}</h4>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
+                    <button onclick="openApp('${title}', '${url}')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs py-2.5 px-4 rounded-xl font-semibold transition-all text-center flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-circle-play mr-2 text-xs"></i> เปิดใช้งาน
+                    </button>
+                    <a href="${url}" target="_blank" class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs transition-all">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+            `;
+
+            grid.appendChild(newCard);
+            closeAddModal();
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-url').value = '';
+            showToast('เพิ่มแอปพลิเคชันสำเร็จแล้ว');
+            searchApps();
+        }
+
+        function showInfoModal(title, desc) {
+            document.getElementById('info-title').innerText = title;
+            document.getElementById('info-desc').innerText = desc;
+            document.getElementById('info-modal').classList.remove('hidden');
+            document.getElementById('info-modal').classList.add('flex');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.add('hidden');
+            document.getElementById('info-modal').classList.remove('flex');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
