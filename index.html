@@ -174,13 +174,19 @@
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded">/</span>
             </div>
 
+            <!-- Admin Toggle Button -->
+            <button onclick="toggleAdminPrompt()" id="admin-toggle-btn" class="px-3.5 py-2 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center space-x-2 text-xs font-semibold transition-all border border-slate-200/80 dark:border-slate-800" title="สลับโหมดผู้ดูแลระบบ">
+                <i id="admin-mode-icon" class="fa-solid fa-lock text-slate-400"></i>
+                <span id="admin-mode-text" class="hidden sm:inline">โหมดทั่วไป</span>
+            </button>
+
             <!-- Theme Switcher Button -->
             <button onclick="toggleTheme()" id="theme-btn" class="w-10 h-10 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-amber-400 flex items-center justify-center transition-all border border-slate-200/80 dark:border-slate-800" title="สลับธีม">
                 <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
             </button>
 
-            <!-- Add App Modal Button -->
-            <button onclick="openAddModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs px-4 py-2.5 rounded-2xl font-medium transition-all shadow-md shadow-indigo-500/20 flex items-center hover:scale-[1.02] active:scale-[0.98]">
+            <!-- Add App Modal Button (Admin Only) -->
+            <button onclick="openAddModal()" class="admin-only hidden bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs px-4 py-2.5 rounded-2xl font-medium transition-all shadow-md shadow-indigo-500/20 flex items-center hover:scale-[1.02] active:scale-[0.98]">
                 <i class="fa-solid fa-plus mr-2 text-xs"></i>
                 <span class="hidden sm:inline">เพิ่มลิงก์แอป / แดชบอร์ด</span>
                 <span class="sm:hidden">เพิ่ม</span>
@@ -208,28 +214,16 @@
             </div>
         </div>
 
-        <!-- Role Filter Pills -->
+        <!-- Role Filter Pills & Category Management -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md p-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 sticky top-24 z-20 transition-all">
-            <div class="flex items-center space-x-1.5 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
-                <button onclick="filterRole('all')" id="pill-all" class="role-btn text-xs px-4 py-2 rounded-xl font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-grid-2 mr-2"></i>ทุกแอปพลิเคชัน
-                </button>
-                <button onclick="filterRole('ops')" id="pill-ops" class="role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-server mr-2 text-blue-500"></i>People Ops & HRIS
-                </button>
-                <button onclick="filterRole('pbp')" id="pill-pbp" class="role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-industry mr-2 text-amber-500"></i>PBP Factory
-                </button>
-                <button onclick="filterRole('ta')" id="pill-ta" class="role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-user-plus mr-2 text-purple-500"></i>Talent Acquisition
-                </button>
-                <button onclick="filterRole('lg')" id="pill-lg" class="role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-graduation-cap mr-2 text-emerald-500"></i>Learning & Growth
-                </button>
-                <button onclick="filterRole('safety')" id="pill-safety" class="role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center">
-                    <i class="fa-solid fa-hard-hat mr-2 text-rose-500"></i>Safety & EHS
-                </button>
+            <div class="flex items-center space-x-1.5 overflow-x-auto custom-scrollbar pb-1 sm:pb-0" id="role-pills-container">
+                <!-- Dynamically rendered category pills -->
             </div>
+            
+            <button onclick="openManageCategoriesModal()" class="admin-only hidden text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-semibold flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 transition-all whitespace-nowrap self-end sm:self-auto">
+                <i class="fa-solid fa-gear text-xs"></i>
+                <span>จัดการตำแหน่ง / หมวดหมู่</span>
+            </button>
         </div>
 
         <!-- MAIN APP LAUNCHER GRID -->
@@ -423,33 +417,155 @@
 
         <!-- QUICK UTILITY LINKS SECTION -->
         <div class="bento-card rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                 <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-folder-open text-indigo-500"></i>
                     <span>คลังเอกสาร & ลิงก์ด่วนในแผนก (HR & Safety Drive)</span>
                 </h4>
+                <button onclick="openManageLinksModal()" class="admin-only hidden text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    <span>จัดการ / แก้ไขลิงก์</span>
+                </button>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <a href="#" onclick="showToast('กำลังเปิด HR & Safety Policy Drive')" class="p-3 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium">
-                    <i class="fa-solid fa-file-pdf text-rose-500 text-base"></i>
-                    <span class="truncate">HR & Safety Policies</span>
-                </a>
-                <a href="#" onclick="showToast('กำลังเปิดแบบฟอร์ม Incident Report')" class="p-3 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base"></i>
-                    <span class="truncate">Safety Incident Form</span>
-                </a>
-                <a href="#" onclick="showToast('กำลังเปิดสมุดโทรศัพท์ภายใน')" class="p-3 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium">
-                    <i class="fa-solid fa-address-book text-emerald-500 text-base"></i>
-                    <span class="truncate">Internal Directory</span>
-                </a>
-                <a href="#" onclick="showToast('กำลังเปิด HR & SHE Helpdesk')" class="p-3 bg-slate-100/80 dark:bg-slate-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl flex items-center space-x-3 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium">
-                    <i class="fa-solid fa-headset text-purple-500 text-base"></i>
-                    <span class="truncate">HR & SHE Helpdesk</span>
-                </a>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="quick-links-container">
+                <!-- Dynamically Rendered Drive Links -->
             </div>
         </div>
 
     </main>
+
+    <!-- Admin Password Modal -->
+    <div id="admin-pass-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-amber-500 text-lg"></i>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">เข้าสู่โหมดผู้ดูแลระบบ</h3>
+                </div>
+                <button onclick="closeAdminPassModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">กรอกรหัสผ่านเพื่อสลับเป็นโหมด Admin (รหัสเริ่มต้น: <code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-amber-500 font-mono">1234</code>)</p>
+            <form onsubmit="verifyAdminPass(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="admin-pass-input" required placeholder="ใส่รหัสผ่าน 4 หลัก" maxlength="8" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-center text-lg tracking-widest font-mono focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeAdminPassModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium">ยกเลิก</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs rounded-xl font-medium shadow-md shadow-amber-500/20">ยืนยันรหัสผ่าน</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manage-categories-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-indigo-500 text-lg"></i>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">จัดการตำแหน่งงาน / หมวดหมู่</h3>
+                </div>
+                <button onclick="closeManageCategoriesModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400">เพิ่ม ปรับแก้ชื่อ หรือลบตำแหน่งงาน/สายงานในแผนก เพื่อแสดงผลในระบบคัดกรองแอป</p>
+
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-categories-list">
+                <!-- Dynamic form list for editing categories -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                <button type="button" onclick="resetCategoriesDefault()" class="text-xs text-rose-500 hover:text-rose-600 font-medium px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-800/40 transition-all">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> รีเซ็ตเป็นค่าเริ่มต้น
+                </button>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="addNewCategoryField()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium transition-all">
+                        <i class="fa-solid fa-plus mr-1"></i> เพิ่มตำแหน่งใหม่
+                    </button>
+                    <button type="button" onclick="saveAllCategories()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-xl font-medium hover:bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูล
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit App Modal -->
+    <div id="edit-app-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">แก้ไขข้อมูลแอป / แดชบอร์ด</h3>
+                <button onclick="closeEditAppModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="saveEditedApp(event)" class="space-y-3">
+                <input type="hidden" id="edit-app-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">ชื่อแอป / เครื่องมือ</label>
+                    <input type="text" id="edit-app-name" required class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">URL (ลิงก์เว็บไซต์)</label>
+                    <input type="url" id="edit-app-url" placeholder="https://..." class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">รายละเอียดสั้นๆ</label>
+                    <textarea id="edit-app-desc" rows="2" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">ตำแหน่ง / หมวดหมู่</label>
+                        <select id="edit-app-role" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                            <!-- Dynamic category options -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">สถานะ</label>
+                        <select id="edit-app-status" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                            <option value="live">พร้อมใช้งาน (Live)</option>
+                            <option value="roadmap">กำลังพัฒนา (Roadmap)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeEditAppModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium">ยกเลิก</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-xl font-medium hover:bg-indigo-500 shadow-md shadow-indigo-500/20">บันทึกการแก้ไข</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Quick Links Modal -->
+    <div id="manage-links-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-brands fa-google-drive text-amber-500 text-lg"></i>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">จัดการคลังเอกสาร & ลิงก์ด่วน (Drive)</h3>
+                </div>
+                <button onclick="closeManageLinksModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400">แก้ไขชื่อ ลิงก์ URL เพิ่ม หรือลบลิงก์ Google Drive ประจำแผนกได้จากที่นี่</p>
+
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-links-list">
+                <!-- Dynamic form list for editing links -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                <button type="button" onclick="resetQuickLinksDefault()" class="text-xs text-rose-500 hover:text-rose-600 font-medium px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-800/40 transition-all">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> รีเซ็ตเป็นค่าเริ่มต้น
+                </button>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="addNewQuickLinkField()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium transition-all">
+                        <i class="fa-solid fa-plus mr-1"></i> เพิ่มลิงก์ใหม่
+                    </button>
+                    <button type="button" onclick="saveAllQuickLinks()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-xl font-medium hover:bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูล
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- App Viewer Modal (Embedded Workspace) -->
     <div id="app-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 transition-all duration-300">
@@ -524,26 +640,656 @@
 
     <!-- MAIN INTERACTIVE SCRIPT -->
     <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.theme = 'light';
-                if (icon) icon.className = 'fa-solid fa-sun text-amber-500 text-sm';
+        // Global Admin State
+        let isAdminMode = false;
+
+        // Default Categories / Positions
+        const DEFAULT_CATEGORIES = [
+            { id: 'ops', name: 'People Operations & HRIS', icon: 'fa-server', color: 'text-blue-500' },
+            { id: 'pbp', name: 'PBP Factory Manager', icon: 'fa-industry', color: 'text-amber-500' },
+            { id: 'ta', name: 'Talent Acquisition', icon: 'fa-user-plus', color: 'text-purple-500' },
+            { id: 'lg', name: 'Learning & Growth', icon: 'fa-graduation-cap', color: 'text-emerald-500' },
+            { id: 'safety', name: 'Safety & EHS', icon: 'fa-hard-hat', color: 'text-rose-500' }
+        ];
+
+        let currentCategories = [];
+        let activeFilterRole = 'all';
+
+        // Default Apps Directory
+        const DEFAULT_APPS = [
+            {
+                id: 'app-1',
+                name: 'Dashboard พนักงาน & การลา',
+                url: 'https://vsc-people-dashbroad.vercel.app/',
+                role: 'ops',
+                desc: 'แดชบอร์ดสรุปสถิติการลาพักร้อน ลาป่วย รายงาน ยอดกำลังพลรายแผนก และข้อมูล HRIS',
+                status: 'live',
+                icon: 'fa-chart-pie',
+                bgGradient: 'from-blue-600 to-indigo-600',
+                keywords: 'dashboard พนักงาน การลา hr hris leave ops headcount analytics'
+            },
+            {
+                id: 'app-2',
+                name: 'E-Book Orientation App',
+                url: 'https://people-center-nine.vercel.app/',
+                role: 'lg',
+                desc: 'คู่มือปฐมนิเทศดิจิทัล รวบรวมสวัสดิการ วัฒนธรรมองค์กร และข้อบังคับสำหรับพนักงานใหม่',
+                status: 'live',
+                icon: 'fa-book-open',
+                bgGradient: 'from-emerald-600 to-teal-500',
+                keywords: 'e-book orientation คู่มือ ปฐมนิเทศ พนักงานใหม่ lg learning growth'
+            },
+            {
+                id: 'app-3',
+                name: 'TA Interview & Headcount Report',
+                url: '',
+                role: 'ta',
+                desc: 'แดชบอร์ดสรุปสถานะการสรรหา Funnel การสัมภาษณ์งาน และรายงาน Headcount รายตำแหน่ง',
+                status: 'roadmap',
+                icon: 'fa-user-plus',
+                keywords: 'ta recruitment funnel headcount สัมภาษณ์ ผู้สมัคร candidates สรรหา'
+            },
+            {
+                id: 'app-4',
+                name: 'Probation 119-Day Evaluation Hub',
+                url: '',
+                role: 'lg',
+                desc: 'ระบบติดตามและแจ้งเตือนรอบการประเมินผลทดลองงานพนักงานใหม่ก่อนครบกำหนด 119 วัน',
+                status: 'roadmap',
+                icon: 'fa-clipboard-check',
+                keywords: 'lg probation 119 ประเมิน ทดลองงาน learning growth evaluation'
+            },
+            {
+                id: 'app-5',
+                name: 'Factory Workforce & OT Health',
+                url: '',
+                role: 'pbp',
+                desc: 'แดชบอร์ดสรุปสถิติอัตราการเข้าทำงานของพนักงานสายผลิต ชั่วโมง OT และข้อมูล Plant Health',
+                status: 'roadmap',
+                icon: 'fa-industry',
+                keywords: 'pbp factory ot workforce plant health โรงงาน สายผลิต'
+            },
+            {
+                id: 'app-6',
+                name: 'EHS Incident & Zero Accident Tracker',
+                url: '',
+                role: 'safety',
+                desc: 'แดชบอร์ดติดตามสถิติความปลอดภัย LTI Free บันทึกรายการ Near-Miss และใบอนุญาตทำงานเสี่ยงสูง',
+                status: 'roadmap',
+                icon: 'fa-hard-hat',
+                keywords: 'safety ehs zero accident incident near miss จป ความปลอดภัย'
+            }
+        ];
+
+        let currentApps = [];
+
+        // Initial Default Drive Links
+        const DEFAULT_DRIVE_LINKS = [
+            {
+                id: 'link-hris',
+                title: 'HRIS Drive (People Ops)',
+                url: 'https://drive.google.com/drive/folders/1et5S3uLqxQRS_SmJogBZA4tRjCL2BJI8?usp=drive_link',
+                icon: 'fa-brands fa-google-drive',
+                color: 'text-blue-500'
+            },
+            {
+                id: 'link-ld',
+                title: 'L&D / L&G Drive',
+                url: 'https://drive.google.com/drive/folders/14pGnfygTdEdmHn-foQSFSYzeXjj2J3Lf?usp=drive_link',
+                icon: 'fa-brands fa-google-drive',
+                color: 'text-emerald-500'
+            },
+            {
+                id: 'link-ta',
+                title: 'TA Recruitment Drive',
+                url: 'https://drive.google.com/drive/folders/1jH4nqmvMpKb1IaB9rMN2kz9CCXrAbDE5',
+                icon: 'fa-brands fa-google-drive',
+                color: 'text-purple-500'
+            },
+            {
+                id: 'link-safety',
+                title: 'HR & Safety Policies Drive',
+                url: 'https://drive.google.com',
+                icon: 'fa-brands fa-google-drive',
+                color: 'text-amber-500'
+            }
+        ];
+
+        let currentDriveLinks = [];
+
+        // Initialize App State
+        function initApp() {
+            initCategories();
+            initApps();
+            initDriveLinks();
+            updateAdminUI();
+        }
+
+        function initCategories() {
+            const saved = localStorage.getItem('people_gateway_categories');
+            if (saved) {
+                try {
+                    currentCategories = JSON.parse(saved);
+                } catch(e) {
+                    currentCategories = [...DEFAULT_CATEGORIES];
+                }
             } else {
-                html.classList.add('dark');
+                currentCategories = [...DEFAULT_CATEGORIES];
+            }
+            renderCategoryPills();
+            renderCategoryDropdowns();
+        }
+
+        function initApps() {
+            const saved = localStorage.getItem('people_gateway_apps');
+            if (saved) {
+                try {
+                    currentApps = JSON.parse(saved);
+                } catch(e) {
+                    currentApps = [...DEFAULT_APPS];
+                }
+            } else {
+                currentApps = [...DEFAULT_APPS];
+            }
+            renderAppsGrid();
+        }
+
+        function initDriveLinks() {
+            const saved = localStorage.getItem('people_gateway_drive_links');
+            if (saved) {
+                try {
+                    currentDriveLinks = JSON.parse(saved);
+                } catch(e) {
+                    currentDriveLinks = [...DEFAULT_DRIVE_LINKS];
+                }
+            } else {
+                currentDriveLinks = [...DEFAULT_DRIVE_LINKS];
+            }
+            renderQuickLinks();
+        }
+
+        // Render Drive Quick Links
+        function renderQuickLinks() {
+            const container = document.getElementById('quick-links-container');
+            if (!container) return;
+
+            if (currentDriveLinks.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 col-span-full py-2">ยังไม่มีลิงก์เอกสารในระบบ</p>`;
+                return;
+            }
+
+            container.innerHTML = currentDriveLinks.map(link => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 rounded-2xl flex items-center justify-between group hover:border-indigo-500/50 transition-all">
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <div class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base ${link.color || 'text-indigo-500'} flex-shrink-0">
+                            <i class="${link.icon || 'fa-brands fa-google-drive'}"></i>
+                        </div>
+                        <div class="truncate">
+                            <h5 class="font-bold text-xs text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${link.title}</h5>
+                            <a href="${link.url}" target="_blank" class="text-[10px] text-slate-400 hover:underline truncate block">เปิด Google Drive</a>
+                        </div>
+                    </div>
+                    <a href="${link.url}" target="_blank" class="p-2 text-slate-400 hover:text-indigo-500 text-xs transition-colors flex-shrink-0" title="เปิดลิงก์">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        // Drive Links Management (Admin)
+        function openManageLinksModal() {
+            if (!isAdminMode) {
+                showToast('เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถจัดการลิงก์ได้');
+                return;
+            }
+            renderManageLinksList();
+            document.getElementById('manage-links-modal').classList.remove('hidden');
+        }
+
+        function closeManageLinksModal() {
+            document.getElementById('manage-links-modal').classList.add('hidden');
+        }
+
+        function renderManageLinksList() {
+            const list = document.getElementById('manage-links-list');
+            if (!list) return;
+
+            list.innerHTML = currentDriveLinks.map((link, index) => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <input type="text" value="${link.title}" id="link-title-${index}" placeholder="ชื่อเอกสาร/ไดรฟ์" class="font-semibold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500 flex-1">
+                        <button type="button" onclick="removeQuickLinkField(${index})" class="p-2 text-rose-500 hover:text-rose-700 text-xs rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors" title="ลบลิงก์นี้">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                    <input type="url" value="${link.url}" id="link-url-${index}" placeholder="https://drive.google.com/..." class="w-full text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-600 dark:text-slate-300 focus:outline-none focus:border-indigo-500">
+                </div>
+            `).join('');
+        }
+
+        function addNewQuickLinkField() {
+            currentDriveLinks.push({
+                id: 'link-' + Date.now(),
+                title: 'เอกสารใหม่',
+                url: 'https://drive.google.com',
+                icon: 'fa-brands fa-google-drive',
+                color: 'text-indigo-500'
+            });
+            renderManageLinksList();
+        }
+
+        function removeQuickLinkField(index) {
+            currentDriveLinks.splice(index, 1);
+            renderManageLinksList();
+        }
+
+        function saveAllQuickLinks() {
+            currentDriveLinks = currentDriveLinks.map((link, index) => {
+                const titleEl = document.getElementById(`link-title-${index}`);
+                const urlEl = document.getElementById(`link-url-${index}`);
+                return {
+                    ...link,
+                    title: titleEl ? titleEl.value.trim() : link.title,
+                    url: urlEl ? urlEl.value.trim() : link.url
+                };
+            });
+
+            localStorage.setItem('people_gateway_drive_links', JSON.stringify(currentDriveLinks));
+            renderQuickLinks();
+            closeManageLinksModal();
+            showToast('บันทึกข้อมูลลิงก์คลังเอกสารเรียบร้อย');
+        }
+
+        function resetQuickLinksDefault() {
+            currentDriveLinks = [...DEFAULT_DRIVE_LINKS];
+            localStorage.setItem('people_gateway_drive_links', JSON.stringify(currentDriveLinks));
+            renderManageLinksList();
+            renderQuickLinks();
+            showToast('รีเซ็ตลิงก์คลังเอกสารกลับเป็นค่าเริ่มต้น');
+        }
+
+        // Modal & Navigation Utilities
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                const icon = document.getElementById('theme-icon');
+                if (icon) icon.className = 'fa-solid fa-moon text-sm';
+            } else {
+                document.documentElement.classList.add('dark');
                 localStorage.theme = 'dark';
-                if (icon) icon.className = 'fa-solid fa-moon text-slate-300 text-sm';
+                const icon = document.getElementById('theme-icon');
+                if (icon) icon.className = 'fa-solid fa-sun text-sm text-amber-400';
             }
         }
 
+        function searchApps() {
+            const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('.app-card');
+            cards.forEach(card => {
+                const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+                const role = card.getAttribute('data-role');
+                const matchesRole = activeFilterRole === 'all' || role === activeFilterRole;
+                const matchesQuery = !query || keywords.includes(query);
+                if (matchesRole && matchesQuery) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function openApp(appName, url) {
+            if (!url) {
+                showToast('แอปพลิเคชันนี้ยังไม่เปิดให้บริการ');
+                return;
+            }
+            const modal = document.getElementById('app-modal');
+            const titleEl = document.getElementById('modal-app-title');
+            const iframe = document.getElementById('app-iframe');
+            const extLink = document.getElementById('modal-external-link');
+            const loader = document.getElementById('iframe-loader');
+
+            if (titleEl) titleEl.innerText = appName;
+            if (iframe) iframe.src = url;
+            if (extLink) extLink.href = url;
+            if (loader) loader.style.display = 'flex';
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAppModal() {
+            const modal = document.getElementById('app-modal');
+            const iframe = document.getElementById('app-iframe');
+            if (iframe) iframe.src = '';
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openAddModal() {
+            if (!isAdminMode) {
+                showToast('เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถเพิ่มแอปได้');
+                return;
+            }
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+        }
+
+        // Category Pills Rendering
+        function renderCategoryPills() {
+            const container = document.getElementById('role-pills-container');
+            if (!container) return;
+
+            let html = `
+                <button onclick="filterRole('all')" id="pill-all" class="role-btn text-xs px-4 py-2 rounded-xl font-semibold ${activeFilterRole === 'all' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid fa-shapes mr-2"></i>ทุกแอปพลิเคชัน
+                </button>
+            `;
+
+            html += currentCategories.map(cat => `
+                <button onclick="filterRole('${cat.id}')" id="pill-${cat.id}" class="role-btn text-xs px-4 py-2 rounded-xl ${activeFilterRole === cat.id ? 'font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-all whitespace-nowrap flex items-center">
+                    <i class="fa-solid ${cat.icon || 'fa-folder'} mr-2 ${activeFilterRole === cat.id ? 'text-white' : (cat.color || 'text-indigo-500')}"></i>${cat.name}
+                </button>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // Category Dropdowns in Add/Edit modals
+        function renderCategoryDropdowns() {
+            const addSelect = document.getElementById('new-app-role');
+            const editSelect = document.getElementById('edit-app-role');
+
+            const options = currentCategories.map(cat => `
+                <option value="${cat.id}">${cat.name}</option>
+            `).join('');
+
+            if (addSelect) addSelect.innerHTML = options;
+            if (editSelect) editSelect.innerHTML = options;
+        }
+
+        // Apps Grid Rendering
+        function renderAppsGrid() {
+            const grid = document.getElementById('live-apps-grid');
+            if (!grid) return;
+
+            grid.innerHTML = currentApps.map(app => {
+                const cat = currentCategories.find(c => c.id === app.role) || { name: 'General', color: 'text-indigo-500' };
+                const isLive = app.status === 'live';
+
+                return `
+                    <div class="app-card bento-card ${isLive ? 'glow-border-indigo' : ''} rounded-3xl p-6 flex flex-col justify-between group relative overflow-hidden shadow-sm hover:shadow-xl" data-role="${app.role}" data-keywords="${(app.keywords || '') + ' ' + app.name.toLowerCase()}" data-app-id="${app.id}">
+                        <div>
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${app.bgGradient || 'from-indigo-600 to-purple-600'} text-white flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid ${app.icon || 'fa-link'}"></i>
+                                </div>
+                                <div class="flex items-center space-x-1.5">
+                                    ${isAdminMode ? `
+                                        <button onclick="openEditAppModal('${app.id}')" title="แก้ไขแอป" class="p-1.5 text-slate-400 hover:text-indigo-500 text-xs transition-colors">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button onclick="deleteApp('${app.id}')" title="ลบแอป" class="p-1.5 text-slate-400 hover:text-rose-500 text-xs transition-colors">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    ` : ''}
+                                    ${isLive ? `
+                                        <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> พร้อมใช้งาน
+                                        </span>
+                                    ` : `
+                                        <span class="bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-semibold">
+                                            กำลังพัฒนา
+                                        </span>
+                                    `}
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <span class="text-[10px] font-bold ${cat.color || 'text-indigo-600'} uppercase tracking-wider">${cat.name}</span>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-base group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${app.name}</h4>
+                                <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                                    ${app.desc || 'ไม่มีรายละเอียดเพิ่มเติม'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
+                            ${isLive ? `
+                                <button onclick="openApp('${app.name}', '${app.url}')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs py-2.5 px-3 rounded-xl font-semibold transition-all text-center flex items-center justify-center shadow-md shadow-indigo-500/20">
+                                    <i class="fa-solid fa-circle-play mr-1.5 text-xs"></i> เปิดแอป
+                                </button>
+                                <a href="${app.url}" target="_blank" class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs transition-all" title="เปิดแท็บใหม่">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            ` : `
+                                <button onclick="showToast('แดชบอร์ดกำลังอยู่ในช่วงพัฒนา จะเปิดใช้งานเร็วๆ นี้')" class="flex-1 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs py-2.5 px-3 rounded-xl font-medium text-center">
+                                    <i class="fa-solid fa-clock mr-1.5 text-xs"></i> เร็วๆ นี้
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            filterRole(activeFilterRole);
+        }
+
+        // ADMIN TOGGLE & UI UPDATE
+        function toggleAdminPrompt() {
+            if (isAdminMode) {
+                isAdminMode = false;
+                updateAdminUI();
+                showToast('ออกจากโหมด Admin เรียบร้อย (โหมดทั่วไปสำหรับใช้งาน)');
+            } else {
+                document.getElementById('admin-pass-modal').classList.remove('hidden');
+                document.getElementById('admin-pass-input').value = '';
+                document.getElementById('admin-pass-input').focus();
+            }
+        }
+
+        function verifyAdminPass(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === '1234') {
+                isAdminMode = true;
+                closeAdminPassModal();
+                updateAdminUI();
+                showToast('เปิดใช้งานโหมดผู้ดูแลระบบ (Admin Mode) สำเร็จ');
+            } else {
+                showToast('รหัสผ่านไม่ถูกต้อง (รหัสเริ่มต้นคือ 1234)');
+            }
+        }
+
+        function closeAdminPassModal() {
+            document.getElementById('admin-pass-modal').classList.add('hidden');
+        }
+
+        function updateAdminUI() {
+            const btnText = document.getElementById('admin-mode-text');
+            const btnIcon = document.getElementById('admin-mode-icon');
+            const adminElements = document.querySelectorAll('.admin-only');
+
+            if (isAdminMode) {
+                if (btnText) btnText.innerText = 'Admin Mode';
+                if (btnIcon) btnIcon.className = 'fa-solid fa-user-gear text-amber-500';
+                adminElements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                if (btnText) btnText.innerText = 'โหมดทั่วไป';
+                if (btnIcon) btnIcon.className = 'fa-solid fa-lock text-slate-400';
+                adminElements.forEach(el => el.classList.add('hidden'));
+            }
+            renderAppsGrid();
+        }
+
+        // CATEGORIES MANAGEMENT (ADMIN)
+        function openManageCategoriesModal() {
+            if (!isAdminMode) return;
+            renderManageCategoriesList();
+            document.getElementById('manage-categories-modal').classList.remove('hidden');
+        }
+
+        function closeManageCategoriesModal() {
+            document.getElementById('manage-categories-modal').classList.add('hidden');
+        }
+
+        function renderManageCategoriesList() {
+            const list = document.getElementById('manage-categories-list');
+            if (!list) return;
+
+            list.innerHTML = currentCategories.map((cat, index) => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between gap-2" id="cat-item-${index}">
+                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="text" value="${cat.name}" id="cat-name-${index}" placeholder="ชื่อตำแหน่ง / หมวดหมู่" class="font-semibold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <input type="text" value="${cat.id}" id="cat-id-${index}" placeholder="ID (เช่น ops, ta)" class="text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-600 dark:text-slate-300 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <button type="button" onclick="removeCategoryField(${index})" class="p-2 text-rose-500 hover:text-rose-700 text-xs rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors" title="ลบตำแหน่งนี้">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addNewCategoryField() {
+            currentCategories.push({
+                id: 'cat_' + Date.now().toString().slice(-4),
+                name: 'ตำแหน่งงานใหม่',
+                icon: 'fa-folder',
+                color: 'text-indigo-500'
+            });
+            renderManageCategoriesList();
+        }
+
+        function removeCategoryField(index) {
+            currentCategories.splice(index, 1);
+            renderManageCategoriesList();
+        }
+
+        function saveAllCategories() {
+            currentCategories = currentCategories.map((cat, index) => {
+                const nameEl = document.getElementById(`cat-name-${index}`);
+                const idEl = document.getElementById(`cat-id-${index}`);
+                return {
+                    ...cat,
+                    name: nameEl ? nameEl.value.trim() : cat.name,
+                    id: idEl ? idEl.value.trim().toLowerCase().replace(/\s+/g, '_') : cat.id
+                };
+            });
+
+            localStorage.setItem('people_gateway_categories', JSON.stringify(currentCategories));
+            renderCategoryPills();
+            renderCategoryDropdowns();
+            renderAppsGrid();
+            closeManageCategoriesModal();
+            showToast('บันทึกการแก้ไขตำแหน่ง / หมวดหมู่เรียบร้อย');
+        }
+
+        function resetCategoriesDefault() {
+            currentCategories = [...DEFAULT_CATEGORIES];
+            localStorage.setItem('people_gateway_categories', JSON.stringify(currentCategories));
+            renderManageCategoriesList();
+            renderCategoryPills();
+            renderCategoryDropdowns();
+            renderAppsGrid();
+            showToast('รีเซ็ตตำแหน่งในแผนกกลับเป็นค่าเริ่มต้น');
+        }
+
+        // EDIT / ADD / DELETE APP LOGIC
+        function openEditAppModal(appId) {
+            if (!isAdminMode) return;
+            const app = currentApps.find(a => a.id === appId);
+            if (!app) return;
+
+            document.getElementById('edit-app-id').value = app.id;
+            document.getElementById('edit-app-name').value = app.name;
+            document.getElementById('edit-app-url').value = app.url || '';
+            document.getElementById('edit-app-desc').value = app.desc || '';
+            document.getElementById('edit-app-role').value = app.role;
+            document.getElementById('edit-app-status').value = app.status || 'live';
+
+            document.getElementById('edit-app-modal').classList.remove('hidden');
+        }
+
+        function closeEditAppModal() {
+            document.getElementById('edit-app-modal').classList.add('hidden');
+        }
+
+        function saveEditedApp(e) {
+            e.preventDefault();
+            const appId = document.getElementById('edit-app-id').value;
+            const name = document.getElementById('edit-app-name').value;
+            const url = document.getElementById('edit-app-url').value;
+            const desc = document.getElementById('edit-app-desc').value;
+            const role = document.getElementById('edit-app-role').value;
+            const status = document.getElementById('edit-app-status').value;
+
+            currentApps = currentApps.map(app => {
+                if (app.id === appId) {
+                    return {
+                        ...app,
+                        name,
+                        url,
+                        desc,
+                        role,
+                        status,
+                        keywords: name.toLowerCase() + ' ' + desc.toLowerCase()
+                    };
+                }
+                return app;
+            });
+
+            localStorage.setItem('people_gateway_apps', JSON.stringify(currentApps));
+            renderAppsGrid();
+            closeEditAppModal();
+            showToast(`แก้ไขข้อมูลแอป "${name}" เรียบร้อย`);
+        }
+
+        function deleteApp(appId) {
+            if (!isAdminMode) return;
+            const app = currentApps.find(a => a.id === appId);
+            if (!app) return;
+
+            currentApps = currentApps.filter(a => a.id !== appId);
+            localStorage.setItem('people_gateway_apps', JSON.stringify(currentApps));
+            renderAppsGrid();
+            showToast(`ลบแอป "${app.name}" เรียบร้อย`);
+        }
+
+        function addNewApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-app-name').value;
+            const url = document.getElementById('new-app-url').value;
+            const role = document.getElementById('new-app-role').value;
+
+            const newAppObj = {
+                id: 'app-' + Date.now(),
+                name: name,
+                url: url,
+                role: role,
+                desc: 'เครื่องมือใหม่ที่เพิ่มโดย Admin',
+                status: 'live',
+                icon: 'fa-link',
+                bgGradient: 'from-indigo-600 to-purple-600',
+                keywords: name.toLowerCase()
+            };
+
+            currentApps.unshift(newAppObj);
+            localStorage.setItem('people_gateway_apps', JSON.stringify(currentApps));
+            renderAppsGrid();
+            closeAddModal();
+            showToast(`เพิ่มแอป "${name}" สำเร็จเรียบร้อย`);
+        }
+
+        // ROLE FILTERING
         function filterRole(role) {
+            activeFilterRole = role;
             const cards = document.querySelectorAll('.app-card');
             const btns = document.querySelectorAll('.role-btn');
             
             btns.forEach(btn => {
-                btn.className = 'role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center';
+                btn.className = `role-btn text-xs px-4 py-2 rounded-xl font-medium bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap flex items-center`;
             });
 
             const activeBtn = document.getElementById(`pill-${role}`);
@@ -560,104 +1306,9 @@
             });
         }
 
-        function searchApps() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const cards = document.querySelectorAll('.app-card');
-
-            cards.forEach(card => {
-                const keywords = card.getAttribute('data-keywords') || '';
-                const text = card.innerText.toLowerCase();
-                if (text.includes(query) || keywords.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function openApp(title, url) {
-            const modal = document.getElementById('app-modal');
-            const iframe = document.getElementById('app-iframe');
-            const titleEl = document.getElementById('modal-app-title');
-            const extLink = document.getElementById('modal-external-link');
-            const loader = document.getElementById('iframe-loader');
-
-            if (loader) loader.style.display = 'flex';
-            titleEl.innerText = title;
-            iframe.src = url;
-            extLink.href = url;
-            modal.classList.remove('hidden');
-        }
-
-        function closeAppModal() {
-            const modal = document.getElementById('app-modal');
-            const iframe = document.getElementById('app-iframe');
-            modal.classList.add('hidden');
-            iframe.src = '';
-        }
-
-        function togglePin(appId) {
-            showToast('บันทึกแอปเป็นรายการโปรดเรียบร้อย');
-        }
-
-        function openAddModal() {
-            document.getElementById('add-modal').classList.remove('hidden');
-        }
-
-        function closeAddModal() {
-            document.getElementById('add-modal').classList.add('hidden');
-        }
-
-        function addNewApp(e) {
-            e.preventDefault();
-            const name = document.getElementById('new-app-name').value;
-            const url = document.getElementById('new-app-url').value;
-            const role = document.getElementById('new-app-role').value;
-
-            const grid = document.getElementById('live-apps-grid');
-            const newCard = document.createElement('div');
-            newCard.className = 'app-card bento-card glow-border-indigo rounded-3xl p-6 flex flex-col justify-between group relative overflow-hidden shadow-sm hover:shadow-xl';
-            newCard.setAttribute('data-role', role);
-            newCard.setAttribute('data-keywords', name.toLowerCase());
-
-            newCard.innerHTML = `
-                <div>
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-md">
-                            <i class="fa-solid fa-link"></i>
-                        </div>
-                        <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-semibold">
-                            Custom Link
-                        </span>
-                    </div>
-                    <div class="space-y-1.5">
-                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Custom Tool</span>
-                        <h4 class="font-bold text-slate-900 dark:text-white text-base">${name}</h4>
-                        <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed truncate">${url}</p>
-                    </div>
-                </div>
-                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
-                    <button onclick="openApp('${name}', '${url}')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs py-2.5 px-3 rounded-xl font-semibold transition-all text-center">
-                        <i class="fa-solid fa-circle-play mr-1.5 text-xs"></i> เปิดแอป
-                    </button>
-                    <a href="${url}" target="_blank" class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 rounded-xl text-xs">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                </div>
-            `;
-            grid.prepend(newCard);
-            closeAddModal();
-            showToast(`เพิ่มแอป "${name}" สำเร็จเรียบร้อย`);
-        }
-
-        // Global hotkey '/' to focus search
-        document.addEventListener('keydown', (e) => {
-            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
-                e.preventDefault();
-                const search = document.getElementById('search-input');
-                if (search) search.focus();
-            }
-        });
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', initApp);
+        initApp();
     </script>
 </body>
 </html>
