@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>People Center - Central HR Hub</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,52 +28,22 @@
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts: Plus Jakarta Sans & Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script>
-        // Initialize Theme
-        if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
+    <!-- EmailJS SDK สำหรับส่งอีเมลจริงเข้า Inbox -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
+    <script>
         function hideIframeLoader() {
             const loader = document.getElementById('iframe-loader');
             if (loader) loader.style.display = 'none';
         }
-
-        function showToast(message) {
-            let toastContainer = document.getElementById('toast-notification');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toast-notification';
-                toastContainer.className = 'fixed bottom-6 right-6 z-50 transform transition-all duration-300 translate-y-16 opacity-0 pointer-events-none';
-                toastContainer.innerHTML = `
-                    <div class="bg-slate-900/95 dark:bg-slate-100/95 backdrop-blur-xl text-white dark:text-slate-900 text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 border border-slate-700/50 dark:border-slate-300/50">
-                        <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-sm"></i>
-                        <span id="toast-message">Notification</span>
-                    </div>
-                `;
-                document.body.appendChild(toastContainer);
-            }
-            const msgEl = document.getElementById('toast-message');
-            if (msgEl) msgEl.innerText = message;
-
-            toastContainer.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
-            toastContainer.classList.add('translate-y-0', 'opacity-100');
-
-            if (window.toastTimeout) clearTimeout(window.toastTimeout);
-            window.toastTimeout = setTimeout(() => {
-                toastContainer.classList.remove('translate-y-0', 'opacity-100');
-                toastContainer.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
-            }, 3000);
-        }
+        window.hideIframeLoader = hideIframeLoader;
     </script>
-    
+
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', 'Prompt', sans-serif; 
@@ -86,25 +56,25 @@
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
 
-        /* Modern Bento Glass Cards */
+        /* Bento Glass Cards */
         .bento-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.85);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .dark .bento-card {
             background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(30, 41, 59, 0.75);
         }
         .bento-card:hover {
             transform: translateY(-2px);
         }
 
-        /* Collapsed Sidebar */
+        /* Collapsed Sidebar on Desktop */
         @media (min-width: 768px) {
             #app-sidebar.sidebar-collapsed {
                 width: 0px !important;
@@ -116,7 +86,7 @@
             }
         }
 
-        /* Glow effects */
+        /* Subtle Card Glow */
         .glow-indigo {
             position: relative;
         }
@@ -126,7 +96,7 @@
             inset: -1px;
             border-radius: 1.5rem;
             padding: 1px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.55), rgba(168, 85, 247, 0.2), transparent);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.15), transparent);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
@@ -134,12 +104,256 @@
         }
     </style>
 </head>
-<body class="h-full bg-slate-100/80 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden selection:bg-indigo-500 selection:text-white">
+<body class="h-full bg-slate-100/90 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden selection:bg-indigo-500 selection:text-white">
 
-    <!-- Mobile Drawer Backdrop -->
+    <!-- 1. LOGIN GATE SCREEN WITH EMAIL, PASSWORD & FORGOT PASSWORD -->
+    <div id="login-gate-screen" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 relative overflow-hidden text-center my-auto">
+            
+            <!-- Ambient Glow Backgrounds -->
+            <div class="absolute -right-16 -top-16 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Brand Icon & Header -->
+            <div class="space-y-2 relative z-10">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center font-black text-2xl shadow-xl shadow-indigo-500/30 mx-auto">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">PEOPLE CENTER</h2>
+                    <p class="text-xs text-slate-400">HR Operations Central Hub</p>
+                </div>
+            </div>
+
+            <!-- Login Form (Email & Password) -->
+            <form onsubmit="handleEmailLogin(event)" class="space-y-3.5 relative z-10 text-left pt-1">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        อีเมลองค์กร (Corporate Email)
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="email" id="login-email" required placeholder="name.xx@valuesourcing.co" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            รหัสผ่าน (Password)
+                        </label>
+                        <button type="button" onclick="openForgotPasswordModal()" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                            ลืมรหัสผ่าน?
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="password" id="login-password" required placeholder="กรอกรหัสผ่านของคุณ" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                        <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs p-1">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>เข้าสู่ระบบ People Center</span>
+                </button>
+            </form>
+
+            <!-- First-time Setup Prompt Callout -->
+            <div class="p-3 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 rounded-2xl text-left flex items-start gap-2.5 relative z-10">
+                <i class="fa-solid fa-key text-indigo-600 dark:text-indigo-400 text-sm mt-0.5"></i>
+                <div class="text-xs text-slate-600 dark:text-slate-300 flex-1">
+                    <p class="font-bold text-indigo-950 dark:text-indigo-200">ยังไม่เคยเข้าใช้งานใช่ไหม?</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">ต้องยืนยันตัวตนผ่านอีเมลและตั้งรหัสผ่านก่อนเข้าใช้งานครั้งแรก</p>
+                    <button type="button" onclick="openFirstTimeSetupModal()" class="mt-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+                        <span>ตั้งรหัสผ่านครั้งแรกที่นี่</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login Error Feedback Box -->
+            <div id="login-error-box" class="hidden p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 text-xs text-left">
+                <p id="login-error-msg" class="font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>อีเมลหรือรหัสผ่านไม่ถูกต้อง</span>
+                </p>
+            </div>
+
+            <!-- Quick Account Selector (7 Whitelist Emails) -->
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 text-[11px] text-slate-400 space-y-2 relative z-10 text-left">
+                <div class="flex items-center justify-between font-semibold text-slate-600 dark:text-slate-300">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-500"></i> บัญชีที่ได้รับอนุญาต (7 อีเมล):</span>
+                </div>
+                <div class="space-y-1 font-mono text-[10px] bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800/80 max-h-40 overflow-y-auto custom-scrollbar" id="whitelist-preview-list">
+                    <!-- Dynamically populated whitelist emails with quick-fill buttons -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 2. FIRST-TIME SETUP MODAL (OTP Verification & Set Password) -->
+    <div id="first-time-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white">ตั้งรหัสผ่านสำหรับเข้าใช้งานครั้งแรก</h3>
+                        <p class="text-[10px] text-slate-400">ยืนยันรหัส OTP ทางอีเมลเพื่อเปิดใช้งานบัญชี</p>
+                    </div>
+                </div>
+                <button onclick="closeFirstTimeSetupModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Step 1: Request OTP -->
+            <div id="first-time-step-1" class="space-y-3">
+                <p class="text-xs text-slate-600 dark:text-slate-300">
+                    กรอกอีเมลองค์กรของคุณที่ได้รับอนุญาต เพื่อรับรหัสยืนยัน OTP (6 หลัก)
+                </p>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">อีเมลของคุณ</label>
+                    <input type="email" id="first-time-email" placeholder="Wanwisa.ch@valuesourcing.co" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div id="first-time-step1-error" class="hidden text-xs text-rose-500 font-medium"></div>
+                <button type="button" onclick="sendFirstTimeOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
+                    ส่งรหัสยืนยันไปยังอีเมล (Request OTP)
+                </button>
+            </div>
+
+            <!-- Step 2: Enter OTP & Set New Password -->
+            <div id="first-time-step-2" class="hidden space-y-3">
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs text-emerald-700 dark:text-emerald-300">
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    ส่งรหัส OTP 6 หลักไปยัง <span id="first-time-target-email" class="font-mono font-bold"></span> เรียบร้อยแล้ว
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">รหัสยืนยัน OTP (6 หลัก)</label>
+                    <input type="text" id="first-time-otp-input" maxlength="6" placeholder="เช่น 482910" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-center text-sm tracking-widest font-mono font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">กำหนดรหัสผ่านใหม่ (อย่างน้อย 4 ตัวอักษร)</label>
+                    <input type="password" id="first-time-new-pwd" placeholder="กรอกรหัสผ่านใหม่" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">ยืนยันรหัสผ่านใหม่อีกครั้ง</label>
+                    <input type="password" id="first-time-confirm-pwd" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div id="first-time-step2-error" class="hidden text-xs text-rose-500 font-medium"></div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="resetFirstTimeModalSteps()" class="px-3 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold">
+                        ย้อนกลับ
+                    </button>
+                    <button type="button" onclick="confirmFirstTimePassword()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
+                        ยืนยันและเปิดใช้งานบัญชี
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. FORGOT PASSWORD MODAL (OTP Verification & Reset Password) -->
+    <div id="forgot-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-lock-rotate"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-900 dark:text-white">รีเซ็ตรหัสผ่าน (Forgot Password)</h3>
+                        <p class="text-[10px] text-slate-400">ยืนยันตัวตนผ่านรหัส OTP เพื่อตั้งรหัสผ่านใหม่</p>
+                    </div>
+                </div>
+                <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Step 1: Enter Email -->
+            <div id="forgot-step-1" class="space-y-3">
+                <p class="text-xs text-slate-600 dark:text-slate-300">
+                    ระบุอีเมลที่คุณใช้เข้าสู่ระบบ เพื่อรับรหัส OTP สำหรับตั้งรหัสผ่านใหม่
+                </p>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">อีเมลองค์กร</label>
+                    <input type="email" id="forgot-email" placeholder="name.xx@valuesourcing.co" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div id="forgot-step1-error" class="hidden text-xs text-rose-500 font-medium"></div>
+                <button type="button" onclick="sendForgotOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
+                    ส่งรหัสยืนยันไปยังอีเมล (Send OTP)
+                </button>
+            </div>
+
+            <!-- Step 2: Enter OTP & New Password -->
+            <div id="forgot-step-2" class="hidden space-y-3">
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs text-emerald-700 dark:text-emerald-300">
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    ส่งรหัส OTP 6 หลักไปยัง <span id="forgot-target-email" class="font-mono font-bold"></span> แล้ว
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">รหัส OTP 6 หลัก</label>
+                    <input type="text" id="forgot-otp-input" maxlength="6" placeholder="เช่น 952130" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-center text-sm tracking-widest font-mono font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">รหัสผ่านใหม่</label>
+                    <input type="password" id="forgot-new-pwd" placeholder="กรอกรหัสผ่านใหม่" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">ยืนยันรหัสผ่านใหม่</label>
+                    <input type="password" id="forgot-confirm-pwd" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div id="forgot-step2-error" class="hidden text-xs text-rose-500 font-medium"></div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="resetForgotModalSteps()" class="px-3 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold">
+                        ย้อนกลับ
+                    </button>
+                    <button type="button" onclick="confirmResetPassword()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
+                        บันทึกรหัสผ่านใหม่
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Notification Simulator Toast -->
+    <div id="otp-simulator-toast" class="fixed top-6 right-6 z-[60] hidden max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 text-left space-y-1.5 transition-all">
+        <div class="flex items-center justify-between text-xs text-amber-400 font-bold">
+            <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-envelope-open-text"></i> จำลองกล่องข้อความอีเมล (Email Inbox)
+            </span>
+            <button onclick="dismissOtpToast()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-[11px] text-slate-300">
+            ระบบได้ส่งรหัสยืนยันไปยังอีเมลของคุณ:
+        </p>
+        <div class="bg-slate-950 p-2.5 rounded-xl font-mono text-center text-lg tracking-widest text-emerald-400 font-bold border border-slate-800" id="otp-simulator-code">
+            ------
+        </div>
+        <p class="text-[10px] text-slate-400 text-center">สามารถคัดลอกรหัสนี้ไปกรอกในช่อง OTP ได้เลยครับ</p>
+    </div>
+
+    <!-- Mobile Backdrop -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity"></div>
 
-    <!-- Navigation Sidebar -->
+    <!-- 4. NAVIGATION SIDEBAR -->
     <aside id="app-sidebar" class="fixed md:static inset-y-0 left-0 w-72 lg:w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 z-40 flex flex-col justify-between transition-all duration-300 -translate-x-full md:translate-x-0 flex-shrink-0">
         
         <!-- Sidebar Brand & Search -->
@@ -167,7 +381,7 @@
             </div>
         </div>
 
-        <!-- Sidebar Content: Departments / Positions & Drive -->
+        <!-- Sidebar Content: Departments & Drive -->
         <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
             <!-- HR Departments / Roles Section -->
             <div class="space-y-1.5">
@@ -201,7 +415,7 @@
             </div>
         </div>
 
-        <!-- Sidebar Footer -->
+        <!-- Sidebar Footer with PROMINENT RED LOGOUT BUTTON -->
         <div class="p-4 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 space-y-2.5">
             <div class="flex items-center space-x-2">
                 <button onclick="toggleTheme()" class="flex-1 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center space-x-2 text-xs font-medium border border-slate-200/80 dark:border-slate-700 transition-all">
@@ -214,11 +428,17 @@
                     <span>เพิ่มแอป</span>
                 </button>
             </div>
+
+            <!-- PROMINENT RED LOGOUT BUTTON IN SIDEBAR -->
+            <button onclick="handleLogout()" class="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 text-xs font-bold transition-all shadow-md shadow-rose-500/20 cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <span>ออกจากระบบ (Logout)</span>
+            </button>
         </div>
 
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- 5. MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col h-full overflow-hidden">
         
         <!-- Header Bar -->
@@ -237,23 +457,23 @@
                 <span id="apps-count-badge" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
                     -- เครื่องมือ
                 </span>
-                
-                <!-- Admin Mode Switcher / Status Button -->
-                <div id="admin-auth-container">
-                    <!-- Dynamically rendered admin toggle button -->
-                </div>
 
                 <button id="admin-add-app-header-btn" onclick="openAddModal()" class="admin-only hidden px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
                     <i class="fa-solid fa-plus text-xs"></i>
                     <span class="hidden sm:inline">เพิ่มระบบใหม่</span>
                 </button>
+
+                <!-- USER PROFILE BADGE & PROMINENT RED LOGOUT BUTTON IN HEADER -->
+                <div id="user-session-container" class="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-3">
+                    <!-- Dynamically rendered user badge + RED logout button -->
+                </div>
             </div>
         </header>
 
         <!-- Main Scrollable Body -->
         <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
 
-            <!-- Welcome Hero Banner -->
+            <!-- Hero Banner -->
             <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-7 border border-slate-800/80 shadow-lg">
                 <div class="relative z-10 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -300,29 +520,6 @@
         </main>
     </div>
 
-    <!-- Admin Authentication Modal -->
-    <div id="admin-auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto text-xl border border-indigo-200 dark:border-indigo-800/60">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-base text-slate-900 dark:text-white">เข้าสู่โหมด Admin</h3>
-                <p class="text-xs text-slate-400 mt-1">กรอกรหัส PIN สำหรับผู้ดูแลระบบเพื่อเปิดสิทธิ์แก้ไขข้อมูลและจัดการลิงก์ทั้งหมด</p>
-            </div>
-            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
-                <div>
-                    <input type="password" id="admin-pin-input" maxlength="8" placeholder="รหัส PIN (เริ่มต้น 1234)" autocomplete="off" required class="w-full text-center tracking-widest text-base font-mono font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-100">
-                    <p id="admin-pin-error" class="text-[11px] text-rose-500 font-medium hidden mt-1.5">รหัส PIN ไม่ถูกต้อง</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="closeAdminAuthModal()" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium transition-all">ยกเลิก</button>
-                    <button type="submit" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-xl font-semibold shadow-md shadow-indigo-500/20 transition-all">ยืนยัน</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- App Workspace Modal (Mac-Style Iframe View) -->
     <div id="app-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 transition-all duration-300">
         <div class="w-full h-full max-w-7xl bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
@@ -354,7 +551,7 @@
                         <span>กำลังโหลดระบบ...</span>
                     </div>
                 </div>
-                <iframe id="app-iframe" src="" class="w-full h-full border-none" onload="hideIframeLoader()"></iframe>
+                <iframe id="app-iframe" src="" class="w-full h-full border-none" onload="if (window.hideIframeLoader) window.hideIframeLoader();"></iframe>
             </div>
         </div>
     </div>
@@ -369,13 +566,8 @@
                 </div>
                 <button onclick="closeManageCategoriesModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
             <p class="text-xs text-slate-500 dark:text-slate-400">เพิ่ม ปรับแก้ชื่อ หรือลบตำแหน่งงานในแผนก เพื่อแสดงเป็นหมวดหมู่ตัวเลือกแถบด้านซ้าย</p>
-
-            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-categories-list">
-                <!-- Dynamic category editing form -->
-            </div>
-
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-categories-list"></div>
             <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
                 <button type="button" onclick="resetCategoriesDefault()" class="text-xs text-rose-500 hover:text-rose-600 font-medium px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-800/40 transition-all">
                     <i class="fa-solid fa-rotate-left mr-1"></i> รีเซ็ตค่าเริ่มต้น
@@ -386,6 +578,33 @@
                     </button>
                     <button type="button" onclick="saveAllCategories()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-xl font-medium hover:bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all">
                         <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูล
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Whitelist & Access Management Modal (Admin Only) -->
+    <div id="manage-whitelist-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-users-gear text-indigo-500 text-lg"></i>
+                    <h3 class="font-bold text-base text-slate-900 dark:text-white">จัดการรายชื่ออีเมลที่ได้รับสิทธิ์</h3>
+                </div>
+                <button onclick="closeWhitelistModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">กำหนดอีเมลองค์กร @valuesourcing.co ที่อนุญาตให้เข้าสู่ระบบ โดยสามารถเพิ่ม/ลบสมาชิกได้อิสระ และกำหนด 1 อีเมลสำหรับสิทธิ์ Admin</p>
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="whitelist-inputs-container"></div>
+            <div id="whitelist-error-msg" class="hidden text-xs text-rose-500 font-semibold p-2.5 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800/60"></div>
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <button type="button" onclick="addNewMemberEmailRow()" class="px-3 py-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-plus text-xs"></i> เพิ่มอีเมลสมาชิก
+                </button>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="closeWhitelistModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium">ยกเลิก</button>
+                    <button type="button" onclick="saveWhitelistSettings()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-xl font-medium hover:bg-indigo-500 shadow-md shadow-indigo-500/20">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกสิทธิ์ผู้ใช้งาน
                     </button>
                 </div>
             </div>
@@ -416,9 +635,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">ตำแหน่ง / หมวด</label>
-                        <select id="edit-app-role" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2 text-xs focus:outline-none focus:border-indigo-500">
-                            <!-- Dynamic category options -->
-                        </select>
+                        <select id="edit-app-role" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2 text-xs focus:outline-none focus:border-indigo-500"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">สถานะ</label>
@@ -446,13 +663,8 @@
                 </div>
                 <button onclick="closeManageLinksModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <p class="text-xs text-slate-500 dark:text-slate-400">แก้ไขชื่อ ลิงก์ URL เพิ่ม หรือลบลิงก์ Google Drive ประจำแผนกได้จากที่นี่</p>
-
-            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-links-list">
-                <!-- Dynamic drive links form -->
-            </div>
-
+            <p class="text-xs text-slate-500 dark:text-slate-400">แก้ไขชื่อ ลิงก์ URL เพิ่ม หรือลบโฟลเดอร์ Google Drive ประจำแผนกได้จากที่นี่</p>
+            <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1" id="manage-links-list"></div>
             <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
                 <button type="button" onclick="resetQuickLinksDefault()" class="text-xs text-rose-500 hover:text-rose-600 font-medium px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/50 dark:border-rose-800/40 transition-all">
                     <i class="fa-solid fa-rotate-left mr-1"></i> รีเซ็ตค่าเริ่มต้น
@@ -491,9 +703,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">หมวดหมู่ / ตำแหน่ง</label>
-                    <select id="new-app-role" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500">
-                        <!-- Dynamic options -->
-                    </select>
+                    <select id="new-app-role" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500"></select>
                 </div>
                 <div class="pt-2 flex justify-end space-x-2">
                     <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium">ยกเลิก</button>
@@ -506,10 +716,84 @@
     <script>
         let activeFilterRole = 'all';
         let isSidebarCollapsed = false;
+        let currentUser = null; // { email: string, role: 'admin' | 'member' }
         let isAdmin = false;
-        const ADMIN_DEFAULT_PIN = '1234';
 
-        // Default Categories / Positions in People & Safety Dept.
+        // Configuration: 7 Authorized Emails as explicitly specified
+        // 1 Admin Email (Full Edit/Delete/Manage rights)
+        // 6 HR Member Emails (View & Access only rights)
+        const DEFAULT_AUTH_CONFIG = {
+            adminEmail: 'Wanwisa.ch@valuesourcing.co',
+            memberEmails: [
+                'sarunpat.ub@valuesourcing.co',
+                'porntida.wo@valuesourcing.co',
+                'jariya.po@valuesourcing.co',
+                'pantharee.ba@valuesourcing.co',
+                'krittasurat.ti@valuesourcing.co',
+                'patcharee.pu@valuesourcing.co',
+                'prasong.pr@valuesourcing.co',
+                'ruttanawalee.th@valuesourcing.co'
+            ]
+        };
+
+        let currentAuthConfig = { ...DEFAULT_AUTH_CONFIG };
+
+        // Password storage mapping: { [email]: password }
+        let userPasswords = {};
+        // Temporary OTP cache: { [email]: { otp: string, expires: number } }
+        let pendingOtps = {};
+
+        /* ==========================================================================
+           การตั้งค่าสำหรับส่งอีเมลจริงผ่าน EmailJS (Email Integration Config)
+           ========================================================================== */
+        const EMAILJS_CONFIG = {
+            enabled: true, 
+            serviceId: 'service_v8wzk0m',     // Service ID ของคุณ
+            templateId: 'template_nx1b6mq',   // Template ID ของคุณ
+            publicKey: (localStorage.getItem('emailjs_public_key') || 'tVEhZWajvPld7QKMd').trim()
+        };
+
+        // เริ่มต้นการทำงานของ EmailJS
+        function initEmailJSSDK() {
+            if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey) {
+                try {
+                    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+                } catch(e) {
+                    console.warn('EmailJS init warning:', e);
+                }
+            }
+        }
+        initEmailJSSDK();
+
+        function openEmailJsConfigModal() {
+            const sId = document.getElementById('cfg-service-id');
+            const tId = document.getElementById('cfg-template-id');
+            const pKey = document.getElementById('cfg-public-key');
+            if (sId) sId.value = EMAILJS_CONFIG.serviceId;
+            if (tId) tId.value = EMAILJS_CONFIG.templateId;
+            if (pKey) pKey.value = EMAILJS_CONFIG.publicKey;
+            document.getElementById('emailjs-config-modal')?.classList.remove('hidden');
+        }
+
+        function closeEmailJsConfigModal() {
+            document.getElementById('emailjs-config-modal')?.classList.add('hidden');
+        }
+
+        function saveEmailJsConfig() {
+            const pKeyInput = document.getElementById('cfg-public-key');
+            const newKey = (pKeyInput?.value || '').trim();
+            if (!newKey) {
+                showToast('กรุณาระบุ Public Key');
+                return;
+            }
+            EMAILJS_CONFIG.publicKey = newKey;
+            localStorage.setItem('emailjs_public_key', newKey);
+            initEmailJSSDK();
+            closeEmailJsConfigModal();
+            showToast('บันทึก Public Key เรียบร้อยแล้ว');
+        }
+
+        // Default Categories / Positions in People Center
         const DEFAULT_CATEGORIES = [
             { id: 'ops', name: 'People Operations & HRIS', icon: 'fa-server', color: 'text-blue-500' },
             { id: 'pbp', name: 'PBP Factory Manager', icon: 'fa-industry', color: 'text-amber-500' },
@@ -523,28 +807,6 @@
 
         // All People, HR & Safety Systems
         const DEFAULT_APPS = [
-            {
-                id: 'app-1',
-                name: 'Dashboard พนักงาน & การลา',
-                url: 'https://vsc-people-dashbroad.vercel.app/',
-                role: 'ops',
-                desc: 'แดชบอร์ดสรุปสถิติการลาพักร้อน ลาป่วย รายงานยอดกำลังพลรายแผนก และข้อมูล HRIS',
-                status: 'live',
-                icon: 'fa-chart-pie',
-                bgGradient: 'from-blue-600 to-indigo-600',
-                keywords: 'dashboard พนักงาน การลา hr hris leave ops headcount analytics'
-            },
-            {
-                id: 'app-2',
-                name: 'E-Book Orientation App',
-                url: 'https://people-center-nine.vercel.app/',
-                role: 'lg',
-                desc: 'คู่มือปฐมนิเทศดิจิทัล รวบรวมสวัสดิการ วัฒนธรรมองค์กร และข้อบังคับสำหรับพนักงานใหม่',
-                status: 'live',
-                icon: 'fa-book-open',
-                bgGradient: 'from-emerald-600 to-teal-500',
-                keywords: 'e-book orientation คู่มือ ปฐมนิเทศ พนักงานใหม่ lg learning growth'
-            },
             {
                 id: 'app-empeo',
                 name: 'Empeo - ระบบลงเวลา & เงินเดือน',
@@ -577,6 +839,28 @@
                 icon: 'fa-id-card-clip',
                 bgGradient: 'from-indigo-600 to-violet-600',
                 keywords: 'vsc es employee service คำร้อง บริการพนักงาน เอกสาร'
+            },
+            {
+                id: 'app-1',
+                name: 'Dashboard พนักงาน & การลา',
+                url: 'https://vsc-people-dashbroad.vercel.app/',
+                role: 'ops',
+                desc: 'แดชบอร์ดสรุปสถิติการลาพักร้อน ลาป่วย รายงานยอดกำลังพลรายแผนก และข้อมูล HRIS',
+                status: 'live',
+                icon: 'fa-chart-pie',
+                bgGradient: 'from-blue-600 to-indigo-600',
+                keywords: 'dashboard พนักงาน การลา hr hris leave ops headcount analytics'
+            },
+            {
+                id: 'app-2',
+                name: 'E-Book Orientation App',
+                url: 'https://people-center-nine.vercel.app/',
+                role: 'lg',
+                desc: 'คู่มือปฐมนิเทศดิจิทัล รวบรวมสวัสดิการ วัฒนธรรมองค์กร และข้อบังคับสำหรับพนักงานใหม่',
+                status: 'live',
+                icon: 'fa-book-open',
+                bgGradient: 'from-emerald-600 to-teal-500',
+                keywords: 'e-book orientation คู่มือ ปฐมนิเทศ พนักงานใหม่ lg learning growth'
             },
             {
                 id: 'app-3',
@@ -660,6 +944,574 @@
 
         let currentDriveLinks = [];
 
+        function showToast(message) {
+            let toastContainer = document.getElementById('toast-notification');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-notification';
+                toastContainer.className = 'fixed bottom-6 right-6 z-50 transform transition-all duration-300 translate-y-16 opacity-0 pointer-events-none';
+                toastContainer.innerHTML = `
+                    <div class="bg-slate-900/95 dark:bg-slate-100/95 backdrop-blur-xl text-white dark:text-slate-900 text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 border border-slate-700/50 dark:border-slate-300/50">
+                        <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-sm"></i>
+                        <span id="toast-message">Notification</span>
+                    </div>
+                `;
+                document.body.appendChild(toastContainer);
+            }
+            const msgEl = document.getElementById('toast-message');
+            if (msgEl) msgEl.innerText = message;
+
+            toastContainer.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+            toastContainer.classList.add('translate-y-0', 'opacity-100');
+
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toastContainer.classList.remove('translate-y-0', 'opacity-100');
+                toastContainer.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                if (icon) icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                if (icon) icon.className = 'fa-solid fa-moon text-amber-500 text-xs';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                if (icon) icon.className = 'fa-solid fa-sun text-amber-400 text-xs';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('app-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (!sidebar) return;
+
+            if (window.innerWidth >= 768) {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('sidebar-collapsed');
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed');
+                }
+            } else {
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    if (backdrop) backdrop.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    if (backdrop) backdrop.classList.add('hidden');
+                }
+            }
+        }
+
+        function loadAuthConfig() {
+            try {
+                const saved = localStorage.getItem('people_center_auth_config');
+                if (saved) {
+                    currentAuthConfig = JSON.parse(saved);
+                }
+            } catch (e) {
+                currentAuthConfig = { ...DEFAULT_AUTH_CONFIG };
+            }
+
+            try {
+                const savedPwds = localStorage.getItem('people_center_passwords');
+                if (savedPwds) {
+                    userPasswords = JSON.parse(savedPwds);
+                }
+            } catch (e) {
+                userPasswords = {};
+            }
+        }
+
+        function isEmailWhitelisted(email) {
+            const clean = (email || '').trim().toLowerCase();
+            const admin = (currentAuthConfig.adminEmail || '').toLowerCase();
+            const members = (currentAuthConfig.memberEmails || []).map(m => m.toLowerCase());
+            return clean === admin || members.includes(clean);
+        }
+
+        function isUserAdmin(email) {
+            const clean = (email || '').trim().toLowerCase();
+            const admin = (currentAuthConfig.adminEmail || '').toLowerCase();
+            return clean === admin;
+        }
+
+        function renderWhitelistPreview() {
+            const container = document.getElementById('whitelist-preview-list');
+            if (!container) return;
+
+            const adminEmail = currentAuthConfig.adminEmail;
+            const members = currentAuthConfig.memberEmails || [];
+
+            let html = `
+                <div class="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                    <button type="button" onclick="quickFillEmail('${adminEmail}')" class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold truncate hover:underline text-left">
+                        <i class="fa-solid fa-crown text-[9px] text-amber-500"></i>
+                        <span class="truncate">${adminEmail}</span>
+                    </button>
+                    <span class="font-sans text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 font-bold shrink-0 ml-1">Admin</span>
+                </div>
+            `;
+
+            members.forEach(email => {
+                const hasPwd = !!userPasswords[email.toLowerCase()];
+                html += `
+                    <div class="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                        <button type="button" onclick="quickFillEmail('${email}')" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 truncate hover:underline text-left">
+                            <span class="w-1.5 h-1.5 rounded-full ${hasPwd ? 'bg-emerald-500' : 'bg-amber-400'}"></span>
+                            <span class="truncate">${email}</span>
+                        </button>
+                        <span class="font-sans text-[9px] px-1.5 py-0.5 rounded ${hasPwd ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400'} font-medium shrink-0 ml-1">
+                            ${hasPwd ? 'พร้อมใช้' : 'ยังไม่ตั้งรหัส'}
+                        </span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function quickFillEmail(email) {
+            const input = document.getElementById('login-email');
+            if (input) {
+                input.value = email;
+                document.getElementById('login-password')?.focus();
+            }
+        }
+
+        function checkUserSession() {
+            try {
+                const savedUser = sessionStorage.getItem('people_center_user_session') || localStorage.getItem('people_center_user');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    isAdmin = currentUser.role === 'admin';
+                    hideLoginGate();
+                } else {
+                    currentUser = null;
+                    isAdmin = false;
+                    showLoginGate();
+                }
+            } catch (e) {
+                currentUser = null;
+                isAdmin = false;
+                showLoginGate();
+            }
+        }
+
+        function showLoginGate() {
+            renderWhitelistPreview();
+            const gate = document.getElementById('login-gate-screen');
+            if (gate) gate.classList.remove('hidden');
+        }
+
+        function hideLoginGate() {
+            const gate = document.getElementById('login-gate-screen');
+            if (gate) gate.classList.add('hidden');
+        }
+
+        function handleEmailLogin(e) {
+            e.preventDefault();
+            const email = (document.getElementById('login-email')?.value || '').trim().toLowerCase();
+            const password = (document.getElementById('login-password')?.value || '').trim();
+            const errBox = document.getElementById('login-error-box');
+            const errMsg = document.getElementById('login-error-msg');
+
+            if (errBox) errBox.classList.add('hidden');
+
+            // 1. Check if email is whitelisted
+            if (!isEmailWhitelisted(email)) {
+                if (errBox && errMsg) {
+                    errMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>อีเมล ${email} ไม่มีสิทธิ์เข้าใช้งานระบบ (จำกัด 7 บัญชี)</span>`;
+                    errBox.classList.remove('hidden');
+                }
+                showToast(`ปฏิเสธการเข้าถึง: อีเมลนี้ไม่ได้รับสิทธิ์`);
+                return;
+            }
+
+            // 2. Check if user has set a password yet
+            const storedPassword = userPasswords[email];
+            if (!storedPassword) {
+                if (errBox && errMsg) {
+                    errMsg.innerHTML = `<i class="fa-solid fa-key"></i><span>ยังไม่เคยตั้งรหัสผ่านสำหรับอีเมลนี้ กรุณากด "ตั้งรหัสผ่านครั้งแรกที่นี่" ด้านล่างก่อน</span>`;
+                    errBox.classList.remove('hidden');
+                }
+                showToast(`กรุณาตั้งรหัสผ่านครั้งแรกก่อนเข้าใช้งาน`);
+                return;
+            }
+
+            // 3. Verify password
+            if (storedPassword !== password) {
+                if (errBox && errMsg) {
+                    errMsg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง หรือกด "ลืมรหัสผ่าน?"</span>`;
+                    errBox.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // 4. Authenticated successfully
+            const role = isUserAdmin(email) ? 'admin' : 'member';
+            currentUser = { email: email, role: role };
+            isAdmin = role === 'admin';
+
+            sessionStorage.setItem('people_center_user_session', JSON.stringify(currentUser));
+            localStorage.setItem('people_center_user', JSON.stringify(currentUser));
+
+            hideLoginGate();
+            updateAdminUI();
+            renderAppsGrid();
+            showToast(`ยินดีต้อนรับ: ${email} (${isAdmin ? 'ผู้ดูแลระบบ Admin' : 'สมาชิก HR'})`);
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            isAdmin = false;
+            sessionStorage.removeItem('people_center_user_session');
+            localStorage.removeItem('people_center_user');
+            const errBox = document.getElementById('login-error-box');
+            if (errBox) errBox.classList.add('hidden');
+            showLoginGate();
+            updateAdminUI();
+            showToast('ออกจากระบบเรียบร้อย');
+        }
+
+        function generateRandomOtp() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        async function triggerEmailOtpNotification(email, otpCode, purpose) {
+            const currentPubKey = (EMAILJS_CONFIG.publicKey || '').trim();
+            let emailSentSuccessfully = false;
+
+            // ส่งอีเมลจริงผ่าน EmailJS SDK
+            if (typeof emailjs !== 'undefined' && currentPubKey) {
+                showToast(`กำลังส่งรหัสยืนยันไปยังอีเมล ${email}...`);
+                try {
+                    const templateParams = {
+                        to_email: email,
+                        email: email,
+                        otp_code: otpCode,
+                        passcode: otpCode,
+                        purpose: purpose === 'first-time' ? 'ตั้งรหัสผ่านครั้งแรก' : 'รีเซ็ตรหัสผ่าน',
+                        app_name: 'People Center'
+                    };
+
+                    // EmailJS SDK v4 sends with options object or public key string
+                    await emailjs.send(
+                        EMAILJS_CONFIG.serviceId, 
+                        EMAILJS_CONFIG.templateId, 
+                        templateParams,
+                        currentPubKey
+                    );
+
+                    emailSentSuccessfully = true;
+                    showToast(`ส่งรหัส OTP เข้ากล่องข้อความ ${email} สำเร็จแล้ว!`);
+                    dismissOtpToast();
+                    return;
+                } catch (error) {
+                    console.error('EmailJS Send Error:', error);
+                    const errDetail = error?.text || error?.message || '';
+                    if (errDetail.includes('Public Key is invalid')) {
+                        showToast(`แจ้งเตือน: Public Key ไม่ถูกต้อง กำลังแสดงรหัสชั่วคราวให้ใช้งาน`);
+                    } else {
+                        showToast(`ส่งอีเมลไม่สำเร็จ: ${errDetail}`);
+                    }
+                }
+            }
+
+            // Fallback สำรองเมื่อเกิดข้อผิดพลาดด้านเครือข่ายหรือ Public Key
+            if (!emailSentSuccessfully) {
+                const toast = document.getElementById('otp-simulator-toast');
+                const codeEl = document.getElementById('otp-simulator-code');
+                const descEl = document.getElementById('otp-simulator-desc');
+                if (toast && codeEl) {
+                    codeEl.innerText = otpCode;
+                    if (descEl) {
+                        descEl.innerHTML = `ส่งอีเมลไม่สำเร็จ (Public Key ไม่ถูกต้อง)<br><span class="text-amber-400 font-semibold">คุณสามารถใช้รหัสนี้ยืนยันได้ทันที:</span>`;
+                    }
+                    toast.classList.remove('hidden');
+                }
+            }
+        }
+
+        function dismissOtpToast() {
+            document.getElementById('otp-simulator-toast')?.classList.add('hidden');
+        }
+
+        // --- First-time Password Setup Logic ---
+        function openFirstTimeSetupModal() {
+            resetFirstTimeModalSteps();
+            const loginEmailVal = (document.getElementById('login-email')?.value || '').trim();
+            if (loginEmailVal) {
+                const ftEmail = document.getElementById('first-time-email');
+                if (ftEmail) ftEmail.value = loginEmailVal;
+            }
+            document.getElementById('first-time-modal')?.classList.remove('hidden');
+        }
+
+        function closeFirstTimeSetupModal() {
+            document.getElementById('first-time-modal')?.classList.add('hidden');
+            dismissOtpToast();
+        }
+
+        function resetFirstTimeModalSteps() {
+            document.getElementById('first-time-step-1')?.classList.remove('hidden');
+            document.getElementById('first-time-step-2')?.classList.add('hidden');
+            const err1 = document.getElementById('first-time-step1-error');
+            const err2 = document.getElementById('first-time-step2-error');
+            if (err1) err1.classList.add('hidden');
+            if (err2) err2.classList.add('hidden');
+        }
+
+        function sendFirstTimeOtp() {
+            const emailInput = document.getElementById('first-time-email');
+            const email = (emailInput?.value || '').trim().toLowerCase();
+            const err = document.getElementById('first-time-step1-error');
+
+            if (!isEmailWhitelisted(email)) {
+                if (err) {
+                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อ 7 อีเมลที่ได้รับอนุญาต`;
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (userPasswords[email]) {
+                if (err) {
+                    err.innerText = `อีเมลนี้เคยตั้งรหัสผ่านแล้ว หากลืมรหัสผ่าน กรุณาใช้ฟังก์ชัน "ลืมรหัสผ่าน?"`;
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Generate OTP and save with expiry (10 mins)
+            const otp = generateRandomOtp();
+            pendingOtps[email] = { otp, expires: Date.now() + 600000 };
+
+            document.getElementById('first-time-target-email').innerText = email;
+            document.getElementById('first-time-step-1').classList.add('hidden');
+            document.getElementById('first-time-step-2').classList.remove('hidden');
+
+            triggerEmailOtpNotification(email, otp, 'first-time');
+        }
+
+        function confirmFirstTimePassword() {
+            const email = (document.getElementById('first-time-target-email')?.innerText || '').trim().toLowerCase();
+            const otpInput = (document.getElementById('first-time-otp-input')?.value || '').trim();
+            const newPwd = (document.getElementById('first-time-new-pwd')?.value || '').trim();
+            const confirmPwd = (document.getElementById('first-time-confirm-pwd')?.value || '').trim();
+            const err = document.getElementById('first-time-step2-error');
+
+            if (err) err.classList.add('hidden');
+
+            const pending = pendingOtps[email];
+            if (!pending || pending.otp !== otpInput) {
+                if (err) {
+                    err.innerText = 'รหัส OTP ไม่ถูกต้อง กรุณาตรวจสอบรหัสที่ส่งไปยังอีเมล';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (newPwd.length < 4) {
+                if (err) {
+                    err.innerText = 'รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                if (err) {
+                    err.innerText = 'รหัสผ่านทั้งสองช่องไม่ตรงกัน';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Save Password
+            userPasswords[email] = newPwd;
+            localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
+            delete pendingOtps[email];
+
+            dismissOtpToast();
+            closeFirstTimeSetupModal();
+            renderWhitelistPreview();
+
+            // Auto fill login email and password
+            const loginEmailInput = document.getElementById('login-email');
+            const loginPwdInput = document.getElementById('login-password');
+            if (loginEmailInput) loginEmailInput.value = email;
+            if (loginPwdInput) loginPwdInput.value = newPwd;
+
+            showToast(`ตั้งรหัสผ่านสำเร็จ! บัญชี ${email} พร้อมเข้าใช้งานแล้ว`);
+        }
+
+        // --- Forgot Password Logic ---
+        function openForgotPasswordModal() {
+            resetForgotModalSteps();
+            const loginEmailVal = (document.getElementById('login-email')?.value || '').trim();
+            if (loginEmailVal) {
+                const fgEmail = document.getElementById('forgot-email');
+                if (fgEmail) fgEmail.value = loginEmailVal;
+            }
+            document.getElementById('forgot-modal')?.classList.remove('hidden');
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgot-modal')?.classList.add('hidden');
+            dismissOtpToast();
+        }
+
+        function resetForgotModalSteps() {
+            document.getElementById('forgot-step-1')?.classList.remove('hidden');
+            document.getElementById('forgot-step-2')?.classList.add('hidden');
+            const err1 = document.getElementById('forgot-step1-error');
+            const err2 = document.getElementById('forgot-step2-error');
+            if (err1) err1.classList.add('hidden');
+            if (err2) err2.classList.add('hidden');
+        }
+
+        function sendForgotOtp() {
+            const emailInput = document.getElementById('forgot-email');
+            const email = (emailInput?.value || '').trim().toLowerCase();
+            const err = document.getElementById('forgot-step1-error');
+
+            if (!isEmailWhitelisted(email)) {
+                if (err) {
+                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อ 7 อีเมลที่ได้รับอนุญาต`;
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Generate OTP
+            const otp = generateRandomOtp();
+            pendingOtps[email] = { otp, expires: Date.now() + 600000 };
+
+            document.getElementById('forgot-target-email').innerText = email;
+            document.getElementById('forgot-step-1').classList.add('hidden');
+            document.getElementById('forgot-step-2').classList.remove('hidden');
+
+            triggerEmailOtpNotification(email, otp, 'forgot-password');
+        }
+
+        function confirmResetPassword() {
+            const email = (document.getElementById('forgot-target-email')?.innerText || '').trim().toLowerCase();
+            const otpInput = (document.getElementById('forgot-otp-input')?.value || '').trim();
+            const newPwd = (document.getElementById('forgot-new-pwd')?.value || '').trim();
+            const confirmPwd = (document.getElementById('forgot-confirm-pwd')?.value || '').trim();
+            const err = document.getElementById('forgot-step2-error');
+
+            if (err) err.classList.add('hidden');
+
+            const pending = pendingOtps[email];
+            if (!pending || pending.otp !== otpInput) {
+                if (err) {
+                    err.innerText = 'รหัส OTP ไม่ถูกต้อง กรุณาตรวจสอบรหัสใหม่อีกครั้ง';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (newPwd.length < 4) {
+                if (err) {
+                    err.innerText = 'รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                if (err) {
+                    err.innerText = 'รหัสผ่านทั้งสองช่องไม่ตรงกัน';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Update Password
+            userPasswords[email] = newPwd;
+            localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
+            delete pendingOtps[email];
+
+            dismissOtpToast();
+            closeForgotPasswordModal();
+            renderWhitelistPreview();
+
+            // Auto fill login password
+            const loginPwdInput = document.getElementById('login-password');
+            if (loginPwdInput) loginPwdInput.value = newPwd;
+
+            showToast(`รีเซ็ตรหัสผ่านสำเร็จ! คุณสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที`);
+        }
+
+        function updateAdminUI() {
+            const sessionContainer = document.getElementById('user-session-container');
+            const adminOnlyElements = document.querySelectorAll('.admin-only');
+
+            // Show or hide admin-only action buttons across the interface
+            adminOnlyElements.forEach(el => {
+                if (isAdmin) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Update Header User & Role Badge with PROMINENT RED LOGOUT BUTTON
+            if (sessionContainer) {
+                if (currentUser) {
+                    const isAdminUser = currentUser.role === 'admin';
+                    sessionContainer.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <!-- User Role Badge -->
+                            <div class="flex items-center gap-1.5 ${isAdminUser ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700/60 text-amber-700 dark:text-amber-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'} border px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm">
+                                <i class="${isAdminUser ? 'fa-solid fa-crown text-amber-500' : 'fa-regular fa-circle-user text-indigo-500'} text-[11px]"></i>
+                                <span class="max-w-[120px] sm:max-w-[170px] truncate font-mono text-[11px]">${currentUser.email}</span>
+                                <span class="${isAdminUser ? 'bg-amber-200 dark:bg-amber-800/80 text-amber-900 dark:text-amber-100' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'} px-1.5 py-0.2 rounded text-[10px] uppercase font-bold">
+                                    ${isAdminUser ? 'Admin' : 'HR'}
+                                </span>
+                            </div>
+
+                            <!-- Whitelist Settings for Admin -->
+                            ${isAdminUser ? `
+                                <button onclick="openWhitelistModal()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs transition-all" title="จัดการ 7 บัญชีผู้ใช้งาน">
+                                    <i class="fa-solid fa-users-gear text-xs"></i>
+                                </button>
+                            ` : ''}
+
+                            <!-- CLEAR PROMINENT RED LOGOUT BUTTON IN HEADER -->
+                            <button onclick="handleLogout()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-500/20 transition-all cursor-pointer" title="ออกจากระบบ">
+                                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                                <span class="hidden sm:inline">ออกจากระบบ</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    sessionContainer.innerHTML = ``;
+                }
+            }
+        }
+
         function renderSidebarCategories() {
             const container = document.getElementById('role-sidebar-container');
             if (!container) return;
@@ -724,151 +1576,6 @@
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors ml-2"></i>
                     </a>
                 `).join('');
-            }
-        }
-
-        function initCategories() {
-            try {
-                const saved = localStorage.getItem('people_gateway_categories');
-                currentCategories = saved ? JSON.parse(saved) : [...DEFAULT_CATEGORIES];
-            } catch (e) {
-                currentCategories = [...DEFAULT_CATEGORIES];
-            }
-            renderCategoryDropdowns();
-            renderSidebarCategories();
-        }
-
-        function initApps() {
-            try {
-                const saved = localStorage.getItem('people_gateway_apps');
-                currentApps = saved ? JSON.parse(saved) : [...DEFAULT_APPS];
-            } catch (e) {
-                currentApps = [...DEFAULT_APPS];
-            }
-            renderAppsGrid();
-        }
-
-        function initDriveLinks() {
-            try {
-                const saved = localStorage.getItem('people_gateway_drive_links');
-                currentDriveLinks = saved ? JSON.parse(saved) : [...DEFAULT_DRIVE_LINKS];
-            } catch (e) {
-                currentDriveLinks = [...DEFAULT_DRIVE_LINKS];
-            }
-            renderDriveLinks();
-        }
-
-        function initApp() {
-            // Check if admin session was previously stored in session
-            isAdmin = sessionStorage.getItem('people_center_is_admin') === 'true';
-            initCategories();
-            initApps();
-            initDriveLinks();
-            updateAdminUI();
-        }
-
-        function openAdminAuthModal() {
-            const modal = document.getElementById('admin-auth-modal');
-            const pinInput = document.getElementById('admin-pin-input');
-            const errEl = document.getElementById('admin-pin-error');
-            if (pinInput) pinInput.value = '';
-            if (errEl) errEl.classList.add('hidden');
-            if (modal) modal.classList.remove('hidden');
-            setTimeout(() => pinInput?.focus(), 100);
-        }
-
-        function closeAdminAuthModal() {
-            const modal = document.getElementById('admin-auth-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const pinInput = document.getElementById('admin-pin-input');
-            const errEl = document.getElementById('admin-pin-error');
-            const currentPin = localStorage.getItem('people_center_admin_pin') || ADMIN_DEFAULT_PIN;
-
-            if (pinInput && pinInput.value.trim() === currentPin) {
-                isAdmin = true;
-                sessionStorage.setItem('people_center_is_admin', 'true');
-                closeAdminAuthModal();
-                updateAdminUI();
-                renderAppsGrid();
-                showToast('เข้าสู่โหมดผู้ดูแลระบบ (Admin Mode) เรียบร้อย');
-            } else {
-                if (errEl) errEl.classList.remove('hidden');
-                if (pinInput) {
-                    pinInput.value = '';
-                    pinInput.focus();
-                }
-            }
-        }
-
-        function exitAdminMode() {
-            isAdmin = false;
-            sessionStorage.removeItem('people_center_is_admin');
-            updateAdminUI();
-            renderAppsGrid();
-            showToast('ออกจากโหมด Admin (สิทธิ์ผู้ใช้งานทั่วไป)');
-        }
-
-        function updateAdminUI() {
-            const adminContainer = document.getElementById('admin-auth-container');
-            const adminOnlyElements = document.querySelectorAll('.admin-only');
-
-            // Show or hide admin-only action buttons across the interface
-            adminOnlyElements.forEach(el => {
-                if (isAdmin) {
-                    el.classList.remove('hidden');
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
-
-            // Update Header Admin Button
-            if (adminContainer) {
-                if (isAdmin) {
-                    adminContainer.innerHTML = `
-                        <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm">
-                            <i class="fa-solid fa-unlock-keyhole text-amber-500"></i>
-                            <span class="hidden sm:inline">โหมด Admin</span>
-                            <button onclick="exitAdminMode()" class="ml-1 text-slate-400 hover:text-rose-500 p-0.5 rounded transition-colors" title="ออกจากโหมด Admin">
-                                <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    adminContainer.innerHTML = `
-                        <button onclick="openAdminAuthModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold border border-slate-200/80 dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-sm" title="คลิกเพื่อเข้าสู่ระบบ Admin">
-                            <i class="fa-solid fa-lock text-slate-400 text-xs"></i>
-                            <span class="hidden sm:inline">Admin Login</span>
-                        </button>
-                    `;
-                }
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('app-sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            if (!sidebar) return;
-
-            if (window.innerWidth >= 768) {
-                isSidebarCollapsed = !isSidebarCollapsed;
-                if (isSidebarCollapsed) {
-                    sidebar.classList.add('sidebar-collapsed');
-                } else {
-                    sidebar.classList.remove('sidebar-collapsed');
-                }
-            } else {
-                const isClosed = sidebar.classList.contains('-translate-x-full');
-                if (isClosed) {
-                    sidebar.classList.remove('-translate-x-full');
-                    if (backdrop) backdrop.classList.remove('hidden');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
-                    if (backdrop) backdrop.classList.add('hidden');
-                }
             }
         }
 
@@ -1024,18 +1731,218 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        function toggleTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const icon = document.getElementById('theme-icon');
-            if (isDark) {
-                document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
-                if (icon) icon.className = 'fa-solid fa-moon text-amber-500 text-xs';
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
-                if (icon) icon.className = 'fa-solid fa-sun text-amber-400 text-xs';
+        let editingMemberList = [];
+        let originalAdminEmailOnOpen = '';
+
+        function openWhitelistModal() {
+            if (!isAdmin) {
+                showToast('ฟังก์ชันนี้สำหรับผู้ดูแลระบบ (Admin) เท่านั้น');
+                return;
             }
+            originalAdminEmailOnOpen = currentAuthConfig.adminEmail || '';
+            editingMemberList = [...(currentAuthConfig.memberEmails || [])];
+            
+            const errEl = document.getElementById('whitelist-error-msg');
+            if (errEl) {
+                errEl.innerText = '';
+                errEl.classList.add('hidden');
+            }
+
+            renderWhitelistModalInputs();
+            document.getElementById('manage-whitelist-modal')?.classList.remove('hidden');
+        }
+
+        function closeWhitelistModal() {
+            document.getElementById('manage-whitelist-modal')?.classList.add('hidden');
+        }
+
+        function renderWhitelistModalInputs() {
+            const container = document.getElementById('whitelist-inputs-container');
+            if (!container) return;
+
+            let html = `
+                <div class="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-crown text-amber-500"></i>
+                            <span>1. บัญชีผู้ดูแลระบบ (Admin Email) - สิทธิ์เต็ม</span>
+                        </label>
+                    </div>
+                    <input type="email" id="whitelist-admin-email" value="${currentAuthConfig.adminEmail || ''}" required class="w-full bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500">
+                    
+                    <!-- Security Verification: Required when changing Admin Email -->
+                    <div class="pt-1.5 border-t border-amber-200/60 dark:border-amber-800/40 space-y-1">
+                        <label class="block text-[11px] font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-amber-500 text-[10px]"></i>
+                            <span>ยืนยันรหัสผ่าน Admin เดิม (จำเป็นเฉพาะเมื่อต้องการเปลี่ยนอีเมล Admin):</span>
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="whitelist-admin-pwd-confirm" placeholder="ใส่รหัสผ่านของบัญชี ${currentAuthConfig.adminEmail || 'Admin'}" class="w-full bg-white dark:bg-slate-900 border border-amber-300/80 dark:border-amber-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500">
+                            <button type="button" onclick="togglePasswordVisibility('whitelist-admin-pwd-confirm', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-amber-600/90 dark:text-amber-400/90">หากไม่เปลี่ยน Admin Email ไม่จำเป็นต้องกรอกช่องนี้</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-1">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users text-indigo-500"></i>
+                            <span>2. บัญชีสมาชิก HR (Member Emails) - สิทธิ์เข้าดูและใช้งาน</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-semibold" id="member-count-label">(${editingMemberList.length} บัญชี)</span>
+                    </div>
+                    <div class="space-y-2" id="member-inputs-list">
+            `;
+
+            if (editingMemberList.length === 0) {
+                html += `
+                    <div class="p-3 text-center text-xs text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                        ยังไม่มีอีเมลสมาชิก กดปุ่ม "+ เพิ่มอีเมลสมาชิก" ด้านล่างเพื่อเพิ่ม
+                    </div>
+                `;
+            } else {
+                editingMemberList.forEach((emailVal, idx) => {
+                    html += `
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400">#${idx + 2}</span>
+                                <input type="email" id="whitelist-member-${idx}" value="${emailVal}" placeholder="member${idx + 1}@valuesourcing.co" oninput="editingMemberList[${idx}] = this.value.trim()" required class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <button type="button" onclick="removeMemberEmailRow(${idx})" class="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors shrink-0" title="ลบอีเมลนี้">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function addNewMemberEmailRow() {
+            // Sync current input values before adding
+            syncEditingMemberListFromDOM();
+            editingMemberList.push('');
+            renderWhitelistModalInputs();
+            // Focus the newly added input
+            setTimeout(() => {
+                const newIdx = editingMemberList.length - 1;
+                document.getElementById(`whitelist-member-${newIdx}`)?.focus();
+            }, 50);
+        }
+
+        function removeMemberEmailRow(index) {
+            syncEditingMemberListFromDOM();
+            editingMemberList.splice(index, 1);
+            renderWhitelistModalInputs();
+        }
+
+        function syncEditingMemberListFromDOM() {
+            editingMemberList = editingMemberList.map((val, idx) => {
+                const input = document.getElementById(`whitelist-member-${idx}`);
+                return input ? input.value.trim() : val;
+            });
+        }
+
+        function saveWhitelistSettings() {
+            if (!isAdmin) {
+                showToast('ฟังก์ชันนี้สำหรับผู้ดูแลระบบ (Admin) เท่านั้น');
+                return;
+            }
+
+            syncEditingMemberListFromDOM();
+
+            const adminEmailInput = document.getElementById('whitelist-admin-email');
+            const newAdminEmail = (adminEmailInput?.value || '').trim();
+            const adminPwdConfirmInput = document.getElementById('whitelist-admin-pwd-confirm');
+            const enteredPwd = (adminPwdConfirmInput?.value || '').trim();
+            const errEl = document.getElementById('whitelist-error-msg');
+
+            if (errEl) errEl.classList.add('hidden');
+
+            if (!newAdminEmail) {
+                if (errEl) {
+                    errEl.innerText = 'กรุณาระบุอีเมล Admin ให้ถูกต้อง';
+                    errEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // Security check: If Admin email is being changed, password of current admin MUST be verified!
+            const isChangingAdminEmail = originalAdminEmailOnOpen.toLowerCase() !== newAdminEmail.toLowerCase();
+
+            if (isChangingAdminEmail) {
+                const currentAdminPwd = userPasswords[originalAdminEmailOnOpen.toLowerCase()];
+                if (!enteredPwd) {
+                    if (errEl) {
+                        errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> คุณกำลังเปลี่ยนบัญชี Admin! กรุณากรอกรหัสผ่านของบัญชีเดิมเพื่อยืนยันสิทธิ์ความปลอดภัย';
+                        errEl.classList.remove('hidden');
+                    }
+                    adminPwdConfirmInput?.focus();
+                    return;
+                }
+
+                if (currentAdminPwd && currentAdminPwd !== enteredPwd) {
+                    if (errEl) {
+                        errEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> รหัสผ่าน Admin ไม่ถูกต้อง! ไม่อนุญาตให้เปลี่ยนอีเมลผู้ดูแลระบบ';
+                        errEl.classList.remove('hidden');
+                    }
+                    adminPwdConfirmInput?.focus();
+                    return;
+                }
+
+                // Transfer password to new admin email if old admin had a password
+                if (currentAdminPwd) {
+                    userPasswords[newAdminEmail.toLowerCase()] = currentAdminPwd;
+                    localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
+                }
+            }
+
+            // Filter out blank member emails
+            const validMembers = editingMemberList.filter(m => m.trim().length > 0);
+
+            // Check for duplicate emails between admin and members
+            if (validMembers.map(m => m.toLowerCase()).includes(newAdminEmail.toLowerCase())) {
+                if (errEl) {
+                    errEl.innerText = 'อีเมล Admin ไม่สามารถซ้ำกับอีเมลในรายชื่อสมาชิก HR ได้';
+                    errEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            currentAuthConfig = {
+                adminEmail: newAdminEmail,
+                memberEmails: validMembers
+            };
+
+            localStorage.setItem('people_center_auth_config', JSON.stringify(currentAuthConfig));
+
+            // If current session email matches new admin, keep admin role
+            if (currentUser && currentUser.email.toLowerCase() === newAdminEmail.toLowerCase()) {
+                currentUser.role = 'admin';
+                isAdmin = true;
+            } else if (currentUser && isChangingAdminEmail && currentUser.email.toLowerCase() === originalAdminEmailOnOpen.toLowerCase()) {
+                // If logged-in admin just changed their own email, update session to new admin email
+                currentUser.email = newAdminEmail;
+                currentUser.role = 'admin';
+                isAdmin = true;
+            } else if (currentUser && validMembers.map(m => m.toLowerCase()).includes(currentUser.email.toLowerCase())) {
+                currentUser.role = 'member';
+                isAdmin = false;
+            }
+
+            sessionStorage.setItem('people_center_user_session', JSON.stringify(currentUser));
+            localStorage.setItem('people_center_user', JSON.stringify(currentUser));
+            
+            updateAdminUI();
+            renderAppsGrid();
+            renderWhitelistPreview();
+            closeWhitelistModal();
+            showToast('บันทึกสิทธิ์และรายชื่อผู้ใช้งานเรียบร้อยแล้ว');
         }
 
         function openManageCategoriesModal() {
@@ -1315,6 +2222,46 @@
             renderManageLinksList();
             renderDriveLinks();
             showToast('รีเซ็ตลิงก์คลังเอกสาร Drive กลับเป็นค่าเริ่มต้น');
+        }
+
+        function initCategories() {
+            try {
+                const saved = localStorage.getItem('people_gateway_categories');
+                currentCategories = saved ? JSON.parse(saved) : [...DEFAULT_CATEGORIES];
+            } catch (e) {
+                currentCategories = [...DEFAULT_CATEGORIES];
+            }
+            renderCategoryDropdowns();
+            renderSidebarCategories();
+        }
+
+        function initApps() {
+            try {
+                const saved = localStorage.getItem('people_gateway_apps');
+                currentApps = saved ? JSON.parse(saved) : [...DEFAULT_APPS];
+            } catch (e) {
+                currentApps = [...DEFAULT_APPS];
+            }
+            renderAppsGrid();
+        }
+
+        function initDriveLinks() {
+            try {
+                const saved = localStorage.getItem('people_gateway_drive_links');
+                currentDriveLinks = saved ? JSON.parse(saved) : [...DEFAULT_DRIVE_LINKS];
+            } catch (e) {
+                currentDriveLinks = [...DEFAULT_DRIVE_LINKS];
+            }
+            renderDriveLinks();
+        }
+
+        function initApp() {
+            loadAuthConfig();
+            checkUserSession();
+            initCategories();
+            initApps();
+            initDriveLinks();
+            updateAdminUI();
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
