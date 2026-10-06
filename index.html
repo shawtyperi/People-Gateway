@@ -33,9 +33,6 @@
     <!-- Google Fonts: Plus Jakarta Sans & Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- EmailJS SDK สำหรับส่งอีเมลจริงเข้า Inbox -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
     <script>
         function hideIframeLoader() {
             const loader = document.getElementById('iframe-loader');
@@ -106,7 +103,7 @@
 </head>
 <body class="h-full bg-slate-100/90 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden selection:bg-indigo-500 selection:text-white">
 
-    <!-- 1. LOGIN GATE SCREEN WITH EMAIL, PASSWORD & FORGOT PASSWORD -->
+    <!-- 1. LOGIN GATE SCREEN -->
     <div id="login-gate-screen" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 overflow-y-auto">
         <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 relative overflow-hidden text-center my-auto">
             
@@ -133,7 +130,7 @@
                     </label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="email" id="login-email" required placeholder="name.xx@valuesourcing.co" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono">
+                        <input type="email" id="login-email" required placeholder="name.lastname@valuesourcing.co" value="" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono">
                     </div>
                 </div>
 
@@ -148,7 +145,7 @@
                     </div>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="password" id="login-password" required placeholder="กรอกรหัสผ่านของคุณ" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                        <input type="password" id="login-password" required placeholder="กรอกรหัสผ่านของคุณ" value="" class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
                         <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs p-1">
                             <i class="fa-solid fa-eye"></i>
                         </button>
@@ -166,7 +163,7 @@
                 <i class="fa-solid fa-key text-indigo-600 dark:text-indigo-400 text-sm mt-0.5"></i>
                 <div class="text-xs text-slate-600 dark:text-slate-300 flex-1">
                     <p class="font-bold text-indigo-950 dark:text-indigo-200">ยังไม่เคยเข้าใช้งานใช่ไหม?</p>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">ต้องยืนยันตัวตนผ่านอีเมลและตั้งรหัสผ่านก่อนเข้าใช้งานครั้งแรก</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">ยืนยันตัวตนผ่านอีเมลและตั้งรหัสผ่านก่อนเข้าใช้งานครั้งแรก</p>
                     <button type="button" onclick="openFirstTimeSetupModal()" class="mt-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
                         <span>ตั้งรหัสผ่านครั้งแรกที่นี่</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -182,20 +179,10 @@
                 </p>
             </div>
 
-            <!-- Quick Account Selector (7 Whitelist Emails) -->
-            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 text-[11px] text-slate-400 space-y-2 relative z-10 text-left">
-                <div class="flex items-center justify-between font-semibold text-slate-600 dark:text-slate-300">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-500"></i> บัญชีที่ได้รับอนุญาต (7 อีเมล):</span>
-                </div>
-                <div class="space-y-1 font-mono text-[10px] bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800/80 max-h-40 overflow-y-auto custom-scrollbar" id="whitelist-preview-list">
-                    <!-- Dynamically populated whitelist emails with quick-fill buttons -->
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- 2. FIRST-TIME SETUP MODAL (OTP Verification & Set Password) -->
+    <!-- 2. FIRST-TIME SETUP MODAL -->
     <div id="first-time-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -223,8 +210,9 @@
                     <input type="email" id="first-time-email" placeholder="Wanwisa.ch@valuesourcing.co" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
                 </div>
                 <div id="first-time-step1-error" class="hidden text-xs text-rose-500 font-medium"></div>
-                <button type="button" onclick="sendFirstTimeOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
-                    ส่งรหัสยืนยันไปยังอีเมล (Request OTP)
+                <button type="button" id="first-time-send-btn" onclick="sendFirstTimeOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>ส่งรหัสยืนยันไปยังอีเมล (Request OTP)</span>
                 </button>
             </div>
 
@@ -264,7 +252,7 @@
         </div>
     </div>
 
-    <!-- 3. FORGOT PASSWORD MODAL (OTP Verification & Reset Password) -->
+    <!-- 3. FORGOT PASSWORD MODAL -->
     <div id="forgot-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -289,11 +277,12 @@
                 </p>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">อีเมลองค์กร</label>
-                    <input type="email" id="forgot-email" placeholder="name.xx@valuesourcing.co" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                    <input type="email" id="forgot-email" placeholder="Wanwisa.ch@valuesourcing.co" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
                 </div>
                 <div id="forgot-step1-error" class="hidden text-xs text-rose-500 font-medium"></div>
-                <button type="button" onclick="sendForgotOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
-                    ส่งรหัสยืนยันไปยังอีเมล (Send OTP)
+                <button type="button" id="forgot-send-btn" onclick="sendForgotOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>ส่งรหัสยืนยันไปยังอีเมล (Send OTP)</span>
                 </button>
             </div>
 
@@ -337,221 +326,41 @@
     <div id="otp-simulator-toast" class="fixed top-6 right-6 z-[60] hidden max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 text-left space-y-1.5 transition-all">
         <div class="flex items-center justify-between text-xs text-amber-400 font-bold">
             <span class="flex items-center gap-1.5">
-                <i class="fa-solid fa-envelope-open-text"></i> จำลองกล่องข้อความอีเมล (Email Inbox)
+                <i class="fa-solid fa-envelope-open-text"></i> กล่องข้อความสำรอง (Backup OTP)
             </span>
             <button onclick="dismissOtpToast()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <p class="text-[11px] text-slate-300">
-            ระบบได้ส่งรหัสยืนยันไปยังอีเมลของคุณ:
+        <p class="text-[11px] text-slate-300" id="otp-simulator-desc">
+            ระบบได้สร้างรหัสยืนยัน:
         </p>
         <div class="bg-slate-950 p-2.5 rounded-xl font-mono text-center text-lg tracking-widest text-emerald-400 font-bold border border-slate-800" id="otp-simulator-code">
             ------
         </div>
-        <p class="text-[10px] text-slate-400 text-center">สามารถคัดลอกรหัสนี้ไปกรอกในช่อง OTP ได้เลยครับ</p>
+        <p class="text-[10px] text-slate-400 text-center">คัดลอกรหัสนี้ไปกรอกในช่อง OTP ได้เลยครับ</p>
     </div>
 
-    <!-- Mobile Backdrop -->
-    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity"></div>
-
-    <!-- 4. NAVIGATION SIDEBAR -->
-    <aside id="app-sidebar" class="fixed md:static inset-y-0 left-0 w-72 lg:w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 z-40 flex flex-col justify-between transition-all duration-300 -translate-x-full md:translate-x-0 flex-shrink-0">
-        
-        <!-- Sidebar Brand & Search -->
-        <div class="p-5 border-b border-slate-200/80 dark:border-slate-800/80 space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-indigo-500/25 flex-shrink-0">
-                        <i class="fa-solid fa-shapes"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white tracking-tight leading-tight">PEOPLE CENTER</h1>
-                        <p class="text-[11px] text-slate-400 font-medium">HR Operations Central Hub</p>
-                    </div>
-                </div>
-                <!-- Collapse Button -->
-                <button onclick="toggleSidebar()" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="หุบเมนู">
-                    <i class="fa-solid fa-angles-left text-xs"></i>
-                </button>
-            </div>
-
-            <!-- Quick Search Input -->
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" id="search-input" onkeyup="searchApps()" placeholder="ค้นหาแอป แดชบอร์ด หรือระบบ..." class="w-full bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 text-xs rounded-xl pl-8 pr-3 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
-            </div>
-        </div>
-
-        <!-- Sidebar Content: Departments & Drive -->
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
-            <!-- HR Departments / Roles Section -->
-            <div class="space-y-1.5">
-                <div class="flex items-center justify-between px-2 mb-2">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">สายงาน / ตำแหน่ง</span>
-                    <button id="admin-manage-cat-btn" onclick="openManageCategoriesModal()" class="admin-only hidden text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-gear"></i> จัดการ
-                    </button>
-                </div>
-                
-                <nav class="space-y-1" id="role-sidebar-container">
-                    <!-- Dynamically rendered roles -->
-                </nav>
-            </div>
-
-            <!-- Google Drive Section for HR -->
-            <div class="space-y-2 pt-2 border-t border-slate-200/70 dark:border-slate-800/70">
-                <div class="flex items-center justify-between px-2">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                        <i class="fa-brands fa-google-drive text-amber-500 text-xs"></i>
-                        <span>คลัง Drive แผนก</span>
-                    </span>
-                    <button id="admin-manage-drive-sidebar-btn" onclick="openManageLinksModal()" class="admin-only hidden text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-pen-to-square"></i> แก้ไข
-                    </button>
-                </div>
-                
-                <div class="space-y-1" id="sidebar-drive-links">
-                    <!-- Dynamically rendered drive links -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar Footer with PROMINENT RED LOGOUT BUTTON -->
-        <div class="p-4 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 space-y-2.5">
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleTheme()" class="flex-1 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center space-x-2 text-xs font-medium border border-slate-200/80 dark:border-slate-700 transition-all">
-                    <i id="theme-icon" class="fa-solid fa-moon text-amber-500 text-xs"></i>
-                    <span id="theme-text">สลับธีม</span>
-                </button>
-
-                <button id="admin-add-app-sidebar-btn" onclick="openAddModal()" class="admin-only hidden py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center space-x-1.5 text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span>เพิ่มแอป</span>
-                </button>
-            </div>
-
-            <!-- PROMINENT RED LOGOUT BUTTON IN SIDEBAR -->
-            <button onclick="handleLogout()" class="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 text-xs font-bold transition-all shadow-md shadow-rose-500/20 cursor-pointer">
-                <i class="fa-solid fa-right-from-bracket text-xs"></i>
-                <span>ออกจากระบบ (Logout)</span>
-            </button>
-        </div>
-
-    </aside>
-
-    <!-- 5. MAIN CONTENT AREA -->
-    <div class="flex-1 flex flex-col h-full overflow-hidden">
-        
-        <!-- Header Bar -->
-        <header class="h-16 border-b border-slate-200/80 dark:border-slate-800/80 px-4 sm:px-8 flex items-center justify-between bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex-shrink-0">
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleSidebar()" id="sidebar-toggle-btn" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="เปิด/ปิดเมนูด้านซ้าย">
-                    <i class="fa-solid fa-bars text-base"></i>
-                </button>
-                <div>
-                    <h2 id="current-view-title" class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white tracking-tight leading-tight">ทุกแอปพลิเคชัน & แดชบอร์ด</h2>
-                    <p id="current-view-desc" class="text-[11px] text-slate-400 font-medium">ศูนย์กลางเข้าใช้งานระบบของทีมงาน People Center</p>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-2.5">
-                <span id="apps-count-badge" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
-                    -- เครื่องมือ
-                </span>
-
-                <button id="admin-add-app-header-btn" onclick="openAddModal()" class="admin-only hidden px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span class="hidden sm:inline">เพิ่มระบบใหม่</span>
-                </button>
-
-                <!-- USER PROFILE BADGE & PROMINENT RED LOGOUT BUTTON IN HEADER -->
-                <div id="user-session-container" class="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-3">
-                    <!-- Dynamically rendered user badge + RED logout button -->
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Scrollable Body -->
-        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
-
-            <!-- Hero Banner -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-7 border border-slate-800/80 shadow-lg">
-                <div class="relative z-10 flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <h3 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                            People Center
-                        </h3>
-                        <span class="inline-flex items-center text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>Hub
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- APPS GRID (Main Content) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="live-apps-grid">
-                <!-- Dynamically Rendered App Cards -->
-            </div>
-
-            <!-- Empty State -->
-            <div id="no-apps-state" class="hidden py-16 text-center space-y-3">
-                <div class="w-14 h-14 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400 text-xl mx-auto">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <h4 class="font-bold text-sm text-slate-700 dark:text-slate-300">ไม่พบแอปพลิเคชันที่ตรงกับเงื่อนไข</h4>
-                <p class="text-xs text-slate-400">ลองเปลี่ยนคำค้นหา หรือเลือกดูทุกระบบที่แถบเมนูด้านซ้าย</p>
-            </div>
-
-            <!-- Google Drive Section at Bottom -->
-            <div id="hr-drive-section" class="bento-card rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-2">
-                        <i class="fa-brands fa-google-drive text-amber-500 text-sm"></i>
-                        <span>คลังเอกสาร & โฟลเดอร์งาน (Google Drive ประจำแผนก)</span>
-                    </h4>
-                    <button id="admin-manage-drive-bottom-btn" onclick="openManageLinksModal()" class="admin-only hidden text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-pen-to-square"></i> จัดการลิงก์
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="quick-links-container">
-                    <!-- Dynamically Rendered Drive Cards -->
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- App Workspace Modal (Mac-Style Iframe View) -->
-    <div id="app-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 transition-all duration-300">
-        <div class="w-full h-full max-w-7xl bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
-            <!-- Modal Header Bar -->
-            <div class="h-14 px-4 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-1.5">
-                        <button onclick="closeAppModal()" class="w-3.5 h-3.5 rounded-full bg-rose-500 hover:bg-rose-600 transition-colors" title="ปิด"></button>
-                        <span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block"></span>
-                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block"></span>
-                    </div>
-                    <span id="modal-app-title" class="font-bold text-xs text-slate-800 dark:text-slate-200 ml-2 truncate max-w-[200px] sm:max-w-md"></span>
-                </div>
+    <!-- Google Apps Script Config Modal -->
+    <div id="gas-config-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div class="flex items-center space-x-2">
-                    <a id="modal-external-link" href="#" target="_blank" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-300 text-xs rounded-xl font-medium transition-all flex items-center space-x-1.5">
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                        <span>เปิดในแท็บใหม่</span>
-                    </a>
-                    <button onclick="closeAppModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
+                    <i class="fa-brands fa-google text-emerald-500 text-lg"></i>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">ตั้งค่า Google Apps Script Web App URL</h3>
                 </div>
+                <button onclick="closeGasConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
             </div>
-            <!-- Iframe Container -->
-            <div class="flex-1 bg-slate-50 dark:bg-slate-950 relative">
-                <div id="iframe-loader" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-10 text-white font-medium text-xs">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-notch animate-spin text-indigo-400 text-lg"></i>
-                        <span>กำลังโหลดระบบ...</span>
-                    </div>
-                </div>
-                <iframe id="app-iframe" src="" class="w-full h-full border-none" onload="if (window.hideIframeLoader) window.hideIframeLoader();"></iframe>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                วาง Web App URL ที่ได้จากการ Deploy Google Apps Script เพื่อให้อีเมลส่งตรงจาก Google Workspace:
+            </p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Web App URL</label>
+                <input type="url" id="cfg-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="pt-2 flex justify-end gap-2">
+                <button type="button" onclick="closeGasConfigModal()" class="px-3 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold">ยกเลิก</button>
+                <button type="button" onclick="saveGasConfig()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md">บันทึก URL</button>
             </div>
         </div>
     </div>
@@ -584,7 +393,7 @@
         </div>
     </div>
 
-    <!-- Whitelist & Access Management Modal (Admin Only) -->
+    <!-- Whitelist & Access Management Modal -->
     <div id="manage-whitelist-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -713,6 +522,177 @@
         </div>
     </div>
 
+    <!-- In-App Preview Modal -->
+    <div id="app-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+        <div class="w-full h-full max-w-7xl max-h-[96vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-slate-200 dark:border-slate-800">
+            <div class="h-14 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">
+                <div class="flex items-center space-x-3 truncate">
+                    <div class="w-3 h-3 rounded-full bg-rose-500 cursor-pointer" onclick="closeAppModal()"></div>
+                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                    <span id="modal-app-title" class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 truncate ml-2">App Preview</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <a id="modal-external-link" href="#" target="_blank" class="p-2 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="เปิดในแท็บใหม่">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <button onclick="closeAppModal()" class="p-2 text-slate-500 hover:text-rose-500 text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative bg-slate-100 dark:bg-slate-950 overflow-hidden">
+                <div id="iframe-loader" class="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70 z-10 backdrop-blur-sm">
+                    <div class="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
+                        <i class="fa-solid fa-spinner animate-spin text-lg"></i>
+                        <span>กำลังเปิดหน้าต่างระบบ...</span>
+                    </div>
+                </div>
+                <iframe id="app-iframe" src="" class="w-full h-full border-0" onload="if(window.hideIframeLoader) hideIframeLoader()"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 hidden md:hidden"></div>
+
+    <!-- MAIN SIDEBAR -->
+    <aside id="app-sidebar" class="w-72 bg-white/95 dark:bg-slate-900/95 border-r border-slate-200/80 dark:border-slate-800 flex flex-col fixed md:static inset-y-0 left-0 z-40 -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out shrink-0 h-full backdrop-blur-xl">
+        
+        <!-- Sidebar Brand Header -->
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/25">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white uppercase leading-none">PEOPLE CENTER</h1>
+                    <p class="text-[10px] text-slate-400 font-medium mt-1">HR Operations Central Hub</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                <i class="fa-solid fa-angles-left text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Search -->
+        <div class="p-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="ค้นหาแอป แดชบอร์ด..." class="w-full bg-slate-100/90 dark:bg-slate-800/80 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 rounded-xl pl-9 pr-3 py-2 border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all">
+            </div>
+        </div>
+
+        <!-- Categories & Roles Nav -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-4">
+            <div>
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">สายงาน / ตำแหน่ง</span>
+                    <button onclick="openManageCategoriesModal()" class="admin-only hidden text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-gear text-[10px]"></i> จัดการ
+                    </button>
+                </div>
+                <div class="space-y-1" id="role-sidebar-container">
+                    <!-- Populated dynamically via renderSidebarCategories() -->
+                </div>
+            </div>
+
+            <!-- Quick Google Drive Links -->
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">คลัง Drive แผนก</span>
+                    <button onclick="openManageLinksModal()" class="admin-only hidden text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square text-[10px]"></i> แก้ไข
+                    </button>
+                </div>
+                <div class="space-y-1 text-xs" id="quick-drive-links">
+                    <!-- Populated dynamically via renderDriveLinks() -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Prominent Red Logout Button Footer -->
+        <div class="p-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <button onclick="handleLogout()" class="w-full py-2.5 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>ออกจากระบบ (Logout)</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50/70 dark:bg-slate-950">
+        
+        <!-- Header Navbar -->
+        <header class="h-16 border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="truncate">
+                    <h2 id="current-view-title" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate leading-tight">
+                        ทุกแอปพลิเคชัน & แดชบอร์ด
+                    </h2>
+                    <p id="current-view-desc" class="text-[10px] sm:text-xs text-slate-400 truncate">
+                        ศูนย์กลางเข้าใช้งานระบบของทีมงาน People Center
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Add New App Button (Admin Only) -->
+                <button onclick="openAddModal()" class="admin-only hidden px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all shadow-md shadow-indigo-500/20 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="hidden sm:inline">เพิ่มระบบใหม่</span>
+                </button>
+
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="สลับโหมด มืด/สว่าง">
+                    <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>
+                </button>
+
+                <!-- Dynamic User Session Container with Prominent Red Logout Button -->
+                <div id="user-session-container" class="flex items-center gap-2">
+                    <!-- Injected via updateAdminUI() -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Body Area -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
+            
+            <!-- Hero Brand Banner -->
+            <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 space-y-2">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>People Center</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight">People Center</h2>
+                    <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                        ศูนย์กลางเข้าใช้งานระบบ แดชบอร์ดสรุปผลการทำงาน และโฟลเดอร์ Google Drive สำหรับทีมงาน People
+                    </p>
+                </div>
+            </div>
+
+            <!-- Apps Grid -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-grid-2"></i>
+                        <span>รายการระบบ & แดชบอร์ด</span>
+                    </h3>
+                </div>
+
+                <div id="live-apps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                    <!-- Apps cards populated dynamically via renderAppsGrid() -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
     <script>
         let activeFilterRole = 'all';
         let isSidebarCollapsed = false;
@@ -720,8 +700,6 @@
         let isAdmin = false;
 
         // Configuration: 7 Authorized Emails as explicitly specified
-        // 1 Admin Email (Full Edit/Delete/Manage rights)
-        // 6 HR Member Emails (View & Access only rights)
         const DEFAULT_AUTH_CONFIG = {
             adminEmail: 'Wanwisa.ch@valuesourcing.co',
             memberEmails: [
@@ -730,9 +708,7 @@
                 'jariya.po@valuesourcing.co',
                 'pantharee.ba@valuesourcing.co',
                 'krittasurat.ti@valuesourcing.co',
-                'patcharee.pu@valuesourcing.co',
-                'prasong.pr@valuesourcing.co',
-                'ruttanawalee.th@valuesourcing.co'
+                'patcharee.pu@valuesourcing.co'
             ]
         };
 
@@ -743,57 +719,31 @@
         // Temporary OTP cache: { [email]: { otp: string, expires: number } }
         let pendingOtps = {};
 
-        /* ==========================================================================
-           การตั้งค่าสำหรับส่งอีเมลจริงผ่าน EmailJS (Email Integration Config)
-           ========================================================================== */
-        const EMAILJS_CONFIG = {
-            enabled: true, 
-            serviceId: 'service_v8wzk0m',     // Service ID ของคุณ
-            templateId: 'template_nx1b6mq',   // Template ID ของคุณ
-            publicKey: (localStorage.getItem('emailjs_public_key') || 'tVEhZWajvPld7QKMd').trim()
+        // Google Apps Script Web App Integration
+        const GAS_CONFIG = {
+            webAppUrl: localStorage.getItem('people_center_gas_url') || ''
         };
 
-        // เริ่มต้นการทำงานของ EmailJS
-        function initEmailJSSDK() {
-            if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey) {
-                try {
-                    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
-                } catch(e) {
-                    console.warn('EmailJS init warning:', e);
-                }
-            }
-        }
-        initEmailJSSDK();
-
-        function openEmailJsConfigModal() {
-            const sId = document.getElementById('cfg-service-id');
-            const tId = document.getElementById('cfg-template-id');
-            const pKey = document.getElementById('cfg-public-key');
-            if (sId) sId.value = EMAILJS_CONFIG.serviceId;
-            if (tId) tId.value = EMAILJS_CONFIG.templateId;
-            if (pKey) pKey.value = EMAILJS_CONFIG.publicKey;
-            document.getElementById('emailjs-config-modal')?.classList.remove('hidden');
+        function openGasConfigModal() {
+            const input = document.getElementById('cfg-gas-url');
+            if (input) input.value = GAS_CONFIG.webAppUrl;
+            document.getElementById('gas-config-modal')?.classList.remove('hidden');
         }
 
-        function closeEmailJsConfigModal() {
-            document.getElementById('emailjs-config-modal')?.classList.add('hidden');
+        function closeGasConfigModal() {
+            document.getElementById('gas-config-modal')?.classList.add('hidden');
         }
 
-        function saveEmailJsConfig() {
-            const pKeyInput = document.getElementById('cfg-public-key');
-            const newKey = (pKeyInput?.value || '').trim();
-            if (!newKey) {
-                showToast('กรุณาระบุ Public Key');
-                return;
-            }
-            EMAILJS_CONFIG.publicKey = newKey;
-            localStorage.setItem('emailjs_public_key', newKey);
-            initEmailJSSDK();
-            closeEmailJsConfigModal();
-            showToast('บันทึก Public Key เรียบร้อยแล้ว');
+        function saveGasConfig() {
+            const input = document.getElementById('cfg-gas-url');
+            const url = (input?.value || '').trim();
+            GAS_CONFIG.webAppUrl = url;
+            localStorage.setItem('people_center_gas_url', url);
+            closeGasConfigModal();
+            showToast(url ? 'บันทึก Google Apps Script URL เรียบร้อยแล้ว' : 'ล้างการตั้งค่า URL แล้ว');
         }
 
-        // Default Categories / Positions in People Center
+        // Default Categories
         const DEFAULT_CATEGORIES = [
             { id: 'ops', name: 'People Operations & HRIS', icon: 'fa-server', color: 'text-blue-500' },
             { id: 'pbp', name: 'PBP Factory Manager', icon: 'fa-industry', color: 'text-amber-500' },
@@ -910,7 +860,7 @@
 
         let currentApps = [];
 
-        // Google Drive Links for Departments
+        // Google Drive Links
         const DEFAULT_DRIVE_LINKS = [
             {
                 id: 'link-hris',
@@ -944,6 +894,7 @@
 
         let currentDriveLinks = [];
 
+        // Toast notification
         function showToast(message) {
             let toastContainer = document.getElementById('toast-notification');
             if (!toastContainer) {
@@ -1055,49 +1006,6 @@
             return clean === admin;
         }
 
-        function renderWhitelistPreview() {
-            const container = document.getElementById('whitelist-preview-list');
-            if (!container) return;
-
-            const adminEmail = currentAuthConfig.adminEmail;
-            const members = currentAuthConfig.memberEmails || [];
-
-            let html = `
-                <div class="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
-                    <button type="button" onclick="quickFillEmail('${adminEmail}')" class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold truncate hover:underline text-left">
-                        <i class="fa-solid fa-crown text-[9px] text-amber-500"></i>
-                        <span class="truncate">${adminEmail}</span>
-                    </button>
-                    <span class="font-sans text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 font-bold shrink-0 ml-1">Admin</span>
-                </div>
-            `;
-
-            members.forEach(email => {
-                const hasPwd = !!userPasswords[email.toLowerCase()];
-                html += `
-                    <div class="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
-                        <button type="button" onclick="quickFillEmail('${email}')" class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 truncate hover:underline text-left">
-                            <span class="w-1.5 h-1.5 rounded-full ${hasPwd ? 'bg-emerald-500' : 'bg-amber-400'}"></span>
-                            <span class="truncate">${email}</span>
-                        </button>
-                        <span class="font-sans text-[9px] px-1.5 py-0.5 rounded ${hasPwd ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400'} font-medium shrink-0 ml-1">
-                            ${hasPwd ? 'พร้อมใช้' : 'ยังไม่ตั้งรหัส'}
-                        </span>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function quickFillEmail(email) {
-            const input = document.getElementById('login-email');
-            if (input) {
-                input.value = email;
-                document.getElementById('login-password')?.focus();
-            }
-        }
-
         function checkUserSession() {
             try {
                 const savedUser = sessionStorage.getItem('people_center_user_session') || localStorage.getItem('people_center_user');
@@ -1118,7 +1026,6 @@
         }
 
         function showLoginGate() {
-            renderWhitelistPreview();
             const gate = document.getElementById('login-gate-screen');
             if (gate) gate.classList.remove('hidden');
         }
@@ -1137,37 +1044,33 @@
 
             if (errBox) errBox.classList.add('hidden');
 
-            // 1. Check if email is whitelisted
             if (!isEmailWhitelisted(email)) {
                 if (errBox && errMsg) {
-                    errMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>อีเมล ${email} ไม่มีสิทธิ์เข้าใช้งานระบบ (จำกัด 7 บัญชี)</span>`;
+                    errMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>อีเมล ${email} ไม่มีสิทธิ์เข้าใช้งานระบบ</span>`;
                     errBox.classList.remove('hidden');
                 }
                 showToast(`ปฏิเสธการเข้าถึง: อีเมลนี้ไม่ได้รับสิทธิ์`);
                 return;
             }
 
-            // 2. Check if user has set a password yet
             const storedPassword = userPasswords[email];
             if (!storedPassword) {
                 if (errBox && errMsg) {
-                    errMsg.innerHTML = `<i class="fa-solid fa-key"></i><span>ยังไม่เคยตั้งรหัสผ่านสำหรับอีเมลนี้ กรุณากด "ตั้งรหัสผ่านครั้งแรกที่นี่" ด้านล่างก่อน</span>`;
+                    errMsg.innerHTML = `<i class="fa-solid fa-key"></i><span>ยังไม่เคยตั้งรหัสผ่านสำหรับอีเมลนี้ กรุณากด "ตั้งรหัสผ่านครั้งแรกที่นี่"</span>`;
                     errBox.classList.remove('hidden');
                 }
                 showToast(`กรุณาตั้งรหัสผ่านครั้งแรกก่อนเข้าใช้งาน`);
                 return;
             }
 
-            // 3. Verify password
             if (storedPassword !== password) {
                 if (errBox && errMsg) {
-                    errMsg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง หรือกด "ลืมรหัสผ่าน?"</span>`;
+                    errMsg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span>`;
                     errBox.classList.remove('hidden');
                 }
                 return;
             }
 
-            // 4. Authenticated successfully
             const role = isUserAdmin(email) ? 'admin' : 'member';
             currentUser = { email: email, role: role };
             isAdmin = role === 'admin';
@@ -1178,7 +1081,7 @@
             hideLoginGate();
             updateAdminUI();
             renderAppsGrid();
-            showToast(`ยินดีต้อนรับ: ${email} (${isAdmin ? 'ผู้ดูแลระบบ Admin' : 'สมาชิก HR'})`);
+            showToast(`ยินดีต้อนรับ: ${email} (${isAdmin ? 'Admin' : 'HR Member'})`);
         }
 
         function handleLogout() {
@@ -1198,57 +1101,48 @@
         }
 
         async function triggerEmailOtpNotification(email, otpCode, purpose) {
-            const currentPubKey = (EMAILJS_CONFIG.publicKey || '').trim();
-            let emailSentSuccessfully = false;
+            const gasUrl = (GAS_CONFIG.webAppUrl || '').trim();
+            const purposeText = purpose === 'first-time' ? 'ตั้งรหัสผ่านครั้งแรก' : 'รีเซ็ตรหัสผ่าน';
+            let sentViaGas = false;
 
-            // ส่งอีเมลจริงผ่าน EmailJS SDK
-            if (typeof emailjs !== 'undefined' && currentPubKey) {
-                showToast(`กำลังส่งรหัสยืนยันไปยังอีเมล ${email}...`);
+            if (gasUrl) {
+                showToast(`กำลังส่ง OTP ผ่าน Google Apps Script ไปยัง ${email}...`);
                 try {
-                    const templateParams = {
-                        to_email: email,
-                        email: email,
-                        otp_code: otpCode,
-                        passcode: otpCode,
-                        purpose: purpose === 'first-time' ? 'ตั้งรหัสผ่านครั้งแรก' : 'รีเซ็ตรหัสผ่าน',
-                        app_name: 'People Center'
-                    };
+                    await fetch(gasUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            email: email,
+                            otp: otpCode,
+                            purpose: purposeText,
+                            app: 'People Center'
+                        })
+                    });
 
-                    // EmailJS SDK v4 sends with options object or public key string
-                    await emailjs.send(
-                        EMAILJS_CONFIG.serviceId, 
-                        EMAILJS_CONFIG.templateId, 
-                        templateParams,
-                        currentPubKey
-                    );
-
-                    emailSentSuccessfully = true;
-                    showToast(`ส่งรหัส OTP เข้ากล่องข้อความ ${email} สำเร็จแล้ว!`);
+                    sentViaGas = true;
+                    showToast(`ส่งรหัสยืนยันไปยังอีเมล ${email} เรียบร้อยแล้ว`);
                     dismissOtpToast();
                     return;
-                } catch (error) {
-                    console.error('EmailJS Send Error:', error);
-                    const errDetail = error?.text || error?.message || '';
-                    if (errDetail.includes('Public Key is invalid')) {
-                        showToast(`แจ้งเตือน: Public Key ไม่ถูกต้อง กำลังแสดงรหัสชั่วคราวให้ใช้งาน`);
-                    } else {
-                        showToast(`ส่งอีเมลไม่สำเร็จ: ${errDetail}`);
-                    }
+                } catch (err) {
+                    console.error('GAS Send Error:', err);
+                    showToast('ส่งผ่าน Google Apps Script ไม่สำเร็จ กำลังแสดงรหัสสำรอง');
                 }
             }
 
-            // Fallback สำรองเมื่อเกิดข้อผิดพลาดด้านเครือข่ายหรือ Public Key
-            if (!emailSentSuccessfully) {
-                const toast = document.getElementById('otp-simulator-toast');
-                const codeEl = document.getElementById('otp-simulator-code');
-                const descEl = document.getElementById('otp-simulator-desc');
-                if (toast && codeEl) {
-                    codeEl.innerText = otpCode;
-                    if (descEl) {
-                        descEl.innerHTML = `ส่งอีเมลไม่สำเร็จ (Public Key ไม่ถูกต้อง)<br><span class="text-amber-400 font-semibold">คุณสามารถใช้รหัสนี้ยืนยันได้ทันที:</span>`;
-                    }
-                    toast.classList.remove('hidden');
+            const toast = document.getElementById('otp-simulator-toast');
+            const codeEl = document.getElementById('otp-simulator-code');
+            const descEl = document.getElementById('otp-simulator-desc');
+            if (toast && codeEl) {
+                codeEl.innerText = otpCode;
+                if (descEl) {
+                    descEl.innerHTML = gasUrl 
+                        ? `เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย:<br><span class="text-amber-400 font-bold">ใช้รหัสนี้ยืนยันได้ทันที:</span>`
+                        : `ยังไม่ได้เชื่อม Google Apps Script URL:<br><span class="text-amber-400 font-bold">ใช้รหัสนี้ยืนยันได้ทันที:</span>`;
                 }
+                toast.classList.remove('hidden');
             }
         }
 
@@ -1281,14 +1175,15 @@
             if (err2) err2.classList.add('hidden');
         }
 
-        function sendFirstTimeOtp() {
+        async function sendFirstTimeOtp() {
             const emailInput = document.getElementById('first-time-email');
             const email = (emailInput?.value || '').trim().toLowerCase();
             const err = document.getElementById('first-time-step1-error');
+            const sendBtn = document.getElementById('first-time-send-btn');
 
             if (!isEmailWhitelisted(email)) {
                 if (err) {
-                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อ 7 อีเมลที่ได้รับอนุญาต`;
+                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อที่ได้รับอนุญาต`;
                     err.classList.remove('hidden');
                 }
                 return;
@@ -1302,7 +1197,11 @@
                 return;
             }
 
-            // Generate OTP and save with expiry (10 mins)
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>กำลังส่งรหัส OTP...</span>`;
+            }
+
             const otp = generateRandomOtp();
             pendingOtps[email] = { otp, expires: Date.now() + 600000 };
 
@@ -1310,7 +1209,12 @@
             document.getElementById('first-time-step-1').classList.add('hidden');
             document.getElementById('first-time-step-2').classList.remove('hidden');
 
-            triggerEmailOtpNotification(email, otp, 'first-time');
+            await triggerEmailOtpNotification(email, otp, 'first-time');
+
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>ส่งรหัสยืนยันไปยังอีเมล (Request OTP)</span>`;
+            }
         }
 
         function confirmFirstTimePassword() {
@@ -1347,16 +1251,13 @@
                 return;
             }
 
-            // Save Password
             userPasswords[email] = newPwd;
             localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
             delete pendingOtps[email];
 
             dismissOtpToast();
             closeFirstTimeSetupModal();
-            renderWhitelistPreview();
 
-            // Auto fill login email and password
             const loginEmailInput = document.getElementById('login-email');
             const loginPwdInput = document.getElementById('login-password');
             if (loginEmailInput) loginEmailInput.value = email;
@@ -1390,20 +1291,25 @@
             if (err2) err2.classList.add('hidden');
         }
 
-        function sendForgotOtp() {
+        async function sendForgotOtp() {
             const emailInput = document.getElementById('forgot-email');
             const email = (emailInput?.value || '').trim().toLowerCase();
             const err = document.getElementById('forgot-step1-error');
+            const sendBtn = document.getElementById('forgot-send-btn');
 
             if (!isEmailWhitelisted(email)) {
                 if (err) {
-                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อ 7 อีเมลที่ได้รับอนุญาต`;
+                    err.innerText = `อีเมล ${email} ไม่อยู่ในรายชื่อที่ได้รับอนุญาต`;
                     err.classList.remove('hidden');
                 }
                 return;
             }
 
-            // Generate OTP
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>กำลังส่งรหัส OTP...</span>`;
+            }
+
             const otp = generateRandomOtp();
             pendingOtps[email] = { otp, expires: Date.now() + 600000 };
 
@@ -1411,7 +1317,12 @@
             document.getElementById('forgot-step-1').classList.add('hidden');
             document.getElementById('forgot-step-2').classList.remove('hidden');
 
-            triggerEmailOtpNotification(email, otp, 'forgot-password');
+            await triggerEmailOtpNotification(email, otp, 'forgot-password');
+
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>ส่งรหัสยืนยันไปยังอีเมล (Send OTP)</span>`;
+            }
         }
 
         function confirmResetPassword() {
@@ -1448,27 +1359,23 @@
                 return;
             }
 
-            // Update Password
             userPasswords[email] = newPwd;
             localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
             delete pendingOtps[email];
 
             dismissOtpToast();
             closeForgotPasswordModal();
-            renderWhitelistPreview();
 
-            // Auto fill login password
             const loginPwdInput = document.getElementById('login-password');
             if (loginPwdInput) loginPwdInput.value = newPwd;
 
-            showToast(`รีเซ็ตรหัสผ่านสำเร็จ! คุณสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที`);
+            showToast(`รีเซ็ตรหัสผ่านสำเร็จ! เข้าสู่ระบบด้วยรหัสใหม่ได้ทันที`);
         }
 
         function updateAdminUI() {
             const sessionContainer = document.getElementById('user-session-container');
             const adminOnlyElements = document.querySelectorAll('.admin-only');
 
-            // Show or hide admin-only action buttons across the interface
             adminOnlyElements.forEach(el => {
                 if (isAdmin) {
                     el.classList.remove('hidden');
@@ -1477,13 +1384,11 @@
                 }
             });
 
-            // Update Header User & Role Badge with PROMINENT RED LOGOUT BUTTON
             if (sessionContainer) {
                 if (currentUser) {
                     const isAdminUser = currentUser.role === 'admin';
                     sessionContainer.innerHTML = `
                         <div class="flex items-center gap-2">
-                            <!-- User Role Badge -->
                             <div class="flex items-center gap-1.5 ${isAdminUser ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700/60 text-amber-700 dark:text-amber-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'} border px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm">
                                 <i class="${isAdminUser ? 'fa-solid fa-crown text-amber-500' : 'fa-regular fa-circle-user text-indigo-500'} text-[11px]"></i>
                                 <span class="max-w-[120px] sm:max-w-[170px] truncate font-mono text-[11px]">${currentUser.email}</span>
@@ -1492,22 +1397,23 @@
                                 </span>
                             </div>
 
-                            <!-- Whitelist Settings for Admin -->
                             ${isAdminUser ? `
-                                <button onclick="openWhitelistModal()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs transition-all" title="จัดการ 7 บัญชีผู้ใช้งาน">
+                                <button onclick="openWhitelistModal()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs transition-all" title="จัดการบัญชีผู้ใช้งาน">
                                     <i class="fa-solid fa-users-gear text-xs"></i>
+                                </button>
+                                <button onclick="openGasConfigModal()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-emerald-600 dark:text-emerald-400 text-xs transition-all" title="ตั้งค่า Google Apps Script">
+                                    <i class="fa-brands fa-google text-xs"></i>
                                 </button>
                             ` : ''}
 
-                            <!-- CLEAR PROMINENT RED LOGOUT BUTTON IN HEADER -->
-                            <button onclick="handleLogout()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-500/20 transition-all cursor-pointer" title="ออกจากระบบ">
+                            <button onclick="handleLogout()" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/20 flex items-center gap-1.5" title="ออกจากระบบ">
                                 <i class="fa-solid fa-right-from-bracket text-xs"></i>
                                 <span class="hidden sm:inline">ออกจากระบบ</span>
                             </button>
                         </div>
                     `;
                 } else {
-                    sessionContainer.innerHTML = ``;
+                    sessionContainer.innerHTML = '';
                 }
             }
         }
@@ -1536,7 +1442,7 @@
                 html += `
                     <button onclick="filterRole('${cat.id}')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all ${isActive ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'}">
                         <div class="flex items-center space-x-2.5 truncate">
-                            <i class="fa-solid ${cat.icon || 'fa-folder'} text-sm w-4 text-center ${isActive ? 'text-white' : (cat.color || 'text-slate-400')}"></i>
+                            <i class="fa-solid ${cat.icon} text-sm w-4 text-center ${isActive ? 'text-white' : cat.color}"></i>
                             <span class="truncate">${cat.name}</span>
                         </div>
                         <span class="text-[10px] px-2 py-0.5 rounded-lg font-mono ${isActive ? 'bg-indigo-700/60 text-white' : 'bg-slate-200/80 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">${count}</span>
@@ -1545,38 +1451,6 @@
             });
 
             container.innerHTML = html;
-        }
-
-        function renderDriveLinks() {
-            // Sidebar drive list
-            const sidebarContainer = document.getElementById('sidebar-drive-links');
-            if (sidebarContainer) {
-                sidebarContainer.innerHTML = currentDriveLinks.map(link => `
-                    <a href="${link.url}" target="_blank" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all group">
-                        <div class="flex items-center space-x-2.5 truncate">
-                            <i class="${link.icon || 'fa-brands fa-google-drive'} text-amber-500 text-sm w-4 text-center"></i>
-                            <span class="truncate font-medium">${link.title}</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-slate-400 group-hover:text-indigo-500 transition-opacity"></i>
-                    </a>
-                `).join('');
-            }
-
-            // Bottom drive cards
-            const bottomContainer = document.getElementById('quick-links-container');
-            if (bottomContainer) {
-                bottomContainer.innerHTML = currentDriveLinks.map(link => `
-                    <a href="${link.url}" target="_blank" class="p-3.5 bg-white/70 dark:bg-slate-900/70 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 border border-slate-200/70 dark:border-slate-800 rounded-2xl flex items-center justify-between group transition-all">
-                        <div class="flex items-center space-x-3 truncate">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/50 flex items-center justify-center flex-shrink-0">
-                                <i class="${link.icon || 'fa-brands fa-google-drive'} text-amber-500 text-sm"></i>
-                            </div>
-                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 truncate">${link.title}</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors ml-2"></i>
-                    </a>
-                `).join('');
-            }
         }
 
         function renderAppsGrid() {
@@ -1663,7 +1537,6 @@
                 }
             }
 
-            // Close mobile sidebar if open
             const sidebar = document.getElementById('app-sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
             if (window.innerWidth < 768 && sidebar && !sidebar.classList.contains('-translate-x-full')) {
@@ -1671,39 +1544,33 @@
                 if (backdrop) backdrop.classList.add('hidden');
             }
 
-            searchApps();
-        }
-
-        function searchApps() {
-            const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
             const cards = document.querySelectorAll('.app-card');
-            let visibleCount = 0;
-
             cards.forEach(card => {
-                const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
-                const role = card.getAttribute('data-role');
-                const matchesRole = activeFilterRole === 'all' || role === activeFilterRole;
-                const matchesQuery = !query || keywords.includes(query);
-
-                if (matchesRole && matchesQuery) {
-                    card.style.display = 'flex';
-                    visibleCount++;
+                const cardRole = card.getAttribute('data-role');
+                if (role === 'all' || cardRole === role) {
+                    card.classList.remove('hidden');
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('hidden');
                 }
             });
+        }
 
-            const countBadge = document.getElementById('apps-count-badge');
-            if (countBadge) countBadge.innerText = `${visibleCount} เครื่องมือ`;
+        function handleSearch() {
+            const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('.app-card');
 
-            const emptyState = document.getElementById('no-apps-state');
-            if (emptyState) {
-                if (visibleCount === 0) {
-                    emptyState.classList.remove('hidden');
+            cards.forEach(card => {
+                const keywords = card.getAttribute('data-keywords') || '';
+                const role = card.getAttribute('data-role');
+                const matchesRole = activeFilterRole === 'all' || role === activeFilterRole;
+                const matchesQuery = query === '' || keywords.includes(query);
+
+                if (matchesRole && matchesQuery) {
+                    card.classList.remove('hidden');
                 } else {
-                    emptyState.classList.add('hidden');
+                    card.classList.add('hidden');
                 }
-            }
+            });
         }
 
         function openApp(appName, url) {
@@ -1731,6 +1598,7 @@
             if (modal) modal.classList.add('hidden');
         }
 
+        // Whitelist management
         let editingMemberList = [];
         let originalAdminEmailOnOpen = '';
 
@@ -1760,6 +1628,9 @@
             const container = document.getElementById('whitelist-inputs-container');
             if (!container) return;
 
+            const adminEmail = currentAuthConfig.adminEmail || '';
+            const isAdminPwdSet = !!userPasswords[adminEmail.toLowerCase()];
+
             let html = `
                 <div class="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl space-y-2.5">
                     <div class="flex items-center justify-between">
@@ -1767,17 +1638,19 @@
                             <i class="fa-solid fa-crown text-amber-500"></i>
                             <span>1. บัญชีผู้ดูแลระบบ (Admin Email) - สิทธิ์เต็ม</span>
                         </label>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isAdminPwdSet ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300 dark:border-amber-700'}">
+                            ${isAdminPwdSet ? '<i class="fa-solid fa-circle-check text-[9px] mr-1"></i>ตั้งรหัสแล้ว' : '<i class="fa-solid fa-clock text-[9px] mr-1"></i>ยังไม่ตั้งรหัส'}
+                        </span>
                     </div>
-                    <input type="email" id="whitelist-admin-email" value="${currentAuthConfig.adminEmail || ''}" required class="w-full bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500">
+                    <input type="email" id="whitelist-admin-email" value="${adminEmail}" required class="w-full bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500">
                     
-                    <!-- Security Verification: Required when changing Admin Email -->
                     <div class="pt-1.5 border-t border-amber-200/60 dark:border-amber-800/40 space-y-1">
                         <label class="block text-[11px] font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1">
                             <i class="fa-solid fa-shield-halved text-amber-500 text-[10px]"></i>
                             <span>ยืนยันรหัสผ่าน Admin เดิม (จำเป็นเฉพาะเมื่อต้องการเปลี่ยนอีเมล Admin):</span>
                         </label>
                         <div class="relative">
-                            <input type="password" id="whitelist-admin-pwd-confirm" placeholder="ใส่รหัสผ่านของบัญชี ${currentAuthConfig.adminEmail || 'Admin'}" class="w-full bg-white dark:bg-slate-900 border border-amber-300/80 dark:border-amber-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500">
+                            <input type="password" id="whitelist-admin-pwd-confirm" placeholder="ใส่รหัสผ่านของบัญชี ${adminEmail || 'Admin'}" class="w-full bg-white dark:bg-slate-900 border border-amber-300/80 dark:border-amber-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500">
                             <button type="button" onclick="togglePasswordVisibility('whitelist-admin-pwd-confirm', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
@@ -1805,11 +1678,15 @@
                 `;
             } else {
                 editingMemberList.forEach((emailVal, idx) => {
+                    const isPwdSet = emailVal && !!userPasswords[emailVal.trim().toLowerCase()];
                     html += `
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400">#${idx + 2}</span>
-                                <input type="email" id="whitelist-member-${idx}" value="${emailVal}" placeholder="member${idx + 1}@valuesourcing.co" oninput="editingMemberList[${idx}] = this.value.trim()" required class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                                <input type="email" id="whitelist-member-${idx}" value="${emailVal}" placeholder="member${idx + 1}@valuesourcing.co" oninput="editingMemberList[${idx}] = this.value.trim()" required class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-28 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+                                <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] px-1.5 py-0.5 rounded font-bold ${isPwdSet ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}">
+                                    ${isPwdSet ? 'ตั้งรหัสแล้ว' : 'ยังไม่ตั้งรหัส'}
+                                </span>
                             </div>
                             <button type="button" onclick="removeMemberEmailRow(${idx})" class="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors shrink-0" title="ลบอีเมลนี้">
                                 <i class="fa-solid fa-trash-can text-xs"></i>
@@ -1824,11 +1701,9 @@
         }
 
         function addNewMemberEmailRow() {
-            // Sync current input values before adding
             syncEditingMemberListFromDOM();
             editingMemberList.push('');
             renderWhitelistModalInputs();
-            // Focus the newly added input
             setTimeout(() => {
                 const newIdx = editingMemberList.length - 1;
                 document.getElementById(`whitelist-member-${newIdx}`)?.focus();
@@ -1872,14 +1747,13 @@
                 return;
             }
 
-            // Security check: If Admin email is being changed, password of current admin MUST be verified!
             const isChangingAdminEmail = originalAdminEmailOnOpen.toLowerCase() !== newAdminEmail.toLowerCase();
 
             if (isChangingAdminEmail) {
                 const currentAdminPwd = userPasswords[originalAdminEmailOnOpen.toLowerCase()];
                 if (!enteredPwd) {
                     if (errEl) {
-                        errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> คุณกำลังเปลี่ยนบัญชี Admin! กรุณากรอกรหัสผ่านของบัญชีเดิมเพื่อยืนยันสิทธิ์ความปลอดภัย';
+                        errEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> กรุณากรอกรหัสผ่าน Admin เดิมเพื่อยืนยันความปลอดภัย';
                         errEl.classList.remove('hidden');
                     }
                     adminPwdConfirmInput?.focus();
@@ -1888,24 +1762,21 @@
 
                 if (currentAdminPwd && currentAdminPwd !== enteredPwd) {
                     if (errEl) {
-                        errEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> รหัสผ่าน Admin ไม่ถูกต้อง! ไม่อนุญาตให้เปลี่ยนอีเมลผู้ดูแลระบบ';
+                        errEl.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> รหัสผ่าน Admin ไม่ถูกต้อง!';
                         errEl.classList.remove('hidden');
                     }
                     adminPwdConfirmInput?.focus();
                     return;
                 }
 
-                // Transfer password to new admin email if old admin had a password
                 if (currentAdminPwd) {
                     userPasswords[newAdminEmail.toLowerCase()] = currentAdminPwd;
                     localStorage.setItem('people_center_passwords', JSON.stringify(userPasswords));
                 }
             }
 
-            // Filter out blank member emails
             const validMembers = editingMemberList.filter(m => m.trim().length > 0);
 
-            // Check for duplicate emails between admin and members
             if (validMembers.map(m => m.toLowerCase()).includes(newAdminEmail.toLowerCase())) {
                 if (errEl) {
                     errEl.innerText = 'อีเมล Admin ไม่สามารถซ้ำกับอีเมลในรายชื่อสมาชิก HR ได้';
@@ -1921,12 +1792,10 @@
 
             localStorage.setItem('people_center_auth_config', JSON.stringify(currentAuthConfig));
 
-            // If current session email matches new admin, keep admin role
             if (currentUser && currentUser.email.toLowerCase() === newAdminEmail.toLowerCase()) {
                 currentUser.role = 'admin';
                 isAdmin = true;
             } else if (currentUser && isChangingAdminEmail && currentUser.email.toLowerCase() === originalAdminEmailOnOpen.toLowerCase()) {
-                // If logged-in admin just changed their own email, update session to new admin email
                 currentUser.email = newAdminEmail;
                 currentUser.role = 'admin';
                 isAdmin = true;
@@ -1940,7 +1809,6 @@
             
             updateAdminUI();
             renderAppsGrid();
-            renderWhitelistPreview();
             closeWhitelistModal();
             showToast('บันทึกสิทธิ์และรายชื่อผู้ใช้งานเรียบร้อยแล้ว');
         }
@@ -2222,6 +2090,19 @@
             renderManageLinksList();
             renderDriveLinks();
             showToast('รีเซ็ตลิงก์คลังเอกสาร Drive กลับเป็นค่าเริ่มต้น');
+        }
+
+        function renderDriveLinks() {
+            const container = document.getElementById('quick-drive-links');
+            if (!container) return;
+
+            container.innerHTML = currentDriveLinks.map(link => `
+                <a href="${link.url}" target="_blank" class="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100 transition-colors truncate group">
+                    <i class="${link.icon} ${link.color} text-sm"></i>
+                    <span class="truncate font-medium">${link.title}</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+            `).join('');
         }
 
         function initCategories() {
